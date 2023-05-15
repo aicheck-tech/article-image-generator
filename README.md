@@ -1,8 +1,8 @@
 # article-image-generator
-Project for generating images for articles
+Project for generating images from and for articles
 
 - Requirements: 
-    - [Python 3.10+](https://www.python.org/downloads/)
+    - [Python 3.9.2](https://www.python.org/downloads/)
     - [NodeJS](https://nodejs.org/en)
 
 ## Installation:
@@ -11,7 +11,7 @@ Project for generating images for articles
     - when you restart your workspace you will need to activate it again, just run the second line
 
 ```cmd
-~\AppData\Local\Programs\Python\Python311\python -m venv venv # create venv
+~\AppData\Local\Programs\Python\Python39\python -m venv venv # create venv
 venv\Scripts\activate           # activate venv
 pip install -r requirements.txt # install needed packages
 ```
