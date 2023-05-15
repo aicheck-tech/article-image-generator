@@ -1,2 +1,19 @@
 fastapi
 uvicorn
+
+# Torch
+torch
+torchvision
+
+# Dzeniks - stable-diffusion
+diffusers
+transformers
+accelerate
+scipy
+safetensors
+
+# Dzeniks - CLIP-OpenAI
+ftfy
+regex
+tqdm
+git+https://github.com/openai/CLIP.git
