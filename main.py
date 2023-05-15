@@ -1,5 +1,6 @@
-import uvicorn
 import sys
+
+import uvicorn
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
@@ -13,10 +14,15 @@ app.mount("/assets", StaticFiles(directory="public/assets"), name="static")
 def main():
     return "public/index.html"
 
-if __name__ == "__main__" and len(sys.argv) > 1:
-    match sys.argv[1]:
-        case 'dev' | "--dev" | "-d":
-            print("dev")
-            uvicorn.run("main:app", port=8002, reload=True)
-        case _:
-            uvicorn.run("main:app", port=8002)
+def shutdown_handler(sig, frame):
+    print("Shutting down server...")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] in ('dev', '--dev', '-d'):
+        print("dev")
+        import signal
+        signal.signal(signal.SIGINT, shutdown_handler)
+        uvicorn.run("main:app", port=8001, reload=True, workers=1)
+    else:
+        uvicorn.run("main:app", port=8001, workers=1)

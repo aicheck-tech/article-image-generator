@@ -11,7 +11,6 @@ export default defineConfig({
       rollupOptions: {
          input: {
             main: './index.html',
-            example: './pages/example.html',
          },
          output: {
             entryFileNames: 'assets/js/[name]-[hash].js',
