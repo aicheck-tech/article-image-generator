@@ -1,8 +1,8 @@
-import os
-import clip
 import torch
 from torch import nn
+import clip
 from PIL import Image
+
 
 class Clip_classification(nn.Module):
     def __init__(self) -> None:
@@ -13,7 +13,7 @@ class Clip_classification(nn.Module):
             param.requires_grad = False
         self.classification_head = Classification_head(2).to(self.device)
 
-    def forward(self, text:torch.Tensor, image: torch.Tensor) -> None:
+    def forward(self, text: torch.Tensor, image: torch.Tensor) -> None:
         image_features = self.model.encode_image(image.to(self.device))
         text_features = self.model.encode_text(text.to(self.device))
         joint = torch.cat([image_features, text_features], dim=1)
@@ -22,10 +22,11 @@ class Clip_classification(nn.Module):
 
     def tokenize(self, text) -> torch.Tensor:
         return clip.tokenize(text)
-    
+
     def convert_img(self, path: str) -> torch.Tensor:
-        image = self.preprocess(Image.open(path)).unsqueeze(0) # type: ignore
+        image = self.preprocess(Image.open(path)).unsqueeze(0)  # type: ignore
         return image
+
 
 class Classification_head(nn.Module):
     def __init__(self, num_classes=2) -> None:
@@ -41,10 +42,11 @@ class Classification_head(nn.Module):
             nn.ReLU(),
             nn.Linear(128, num_classes).to(torch.float16)
         )
-    
+
     def forward(self, x):
         x = self.layers(x)
         return x
+
 
 # Not used yet
 class DeepConcatenationModel(nn.Module):
@@ -69,4 +71,4 @@ class DeepConcatenationModel(nn.Module):
         text = self.text_layer(text)
         img = self.img_layer(img)
         x = torch.cat([text, img], dim=1)
-        return x    
+        return x
