@@ -1,5 +1,10 @@
-fastapi
-uvicorn
+# Stefik - FastAPI
+fastapi==0.95.1
+uvicorn==0.22.0
+
+# Stefik - TextProcessing
+openai==0.27.6
+python-dotenv==1.0.0
 
 # Torch
 torch
