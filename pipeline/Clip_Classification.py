@@ -70,29 +70,3 @@ class DeepConcatenationModel(nn.Module):
         img = self.img_layer(img)
         x = torch.cat([text, img], dim=1)
         return x    
-
-if __name__ == "__main__":
-    model = Clip_classification()
-    text = model.tokenize("This diagram shows some of the forces acting on a cat")
-    image = model.convert_img("CLIP.png")
-    output = model(text, image)
-    print()
-    print(output)
-    print(output.argmax())
-    print(output.softmax(dim=1))
-
-    text = model.tokenize("This diagram shows some grid")
-    image = model.convert_img("CLIP.png")
-    output = model(text, image)
-    print()
-    print(output)
-    print(output.argmax())
-    print(output.softmax(dim=1))
-
-    text = model.tokenize("This diagram shows some dog")
-    image = model.convert_img("CLIP.png")
-    output = model(text, image)
-    print()
-    print(output)
-    print(output.argmax())
-    print(output.softmax(dim=1))
