@@ -1,5 +1,7 @@
 # Stefik_O ignores
 public
+*.local
+*.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
