@@ -1,26 +1,44 @@
-import os
+import logging
 
-from dotenv import load_dotenv
+from textProcessing import text_processing
 
-from textProcessing import TextProcessing
+if __name__ == '__main__':
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)s %(message)s', 
+        level=logging.INFO,
+        datefmt='%Y-%m-%d %H:%M:%S',
+        # filename="prompt-gen-test.log",
+        # filemode="w"
+        )
 
-load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_API_ENGINE = os.getenv("OPENAI_API_ENGINE")
-OPENAI_CUSTOM_DOMAIN = os.getenv("OPENAI_CUSTOM_DOMAIN")
+test_text = """Ukraine says it shot down hypersonic missiles amid an "exceptionally dense" barrage fired at Kyiv on Tuesday.
 
-testText = """Worldwide Home Video Game Console Market Shares, 2022: Xbox Shined Digitally While Nintendo Switch Slid
-4 500 $
-Lewis Ward
-This IDC study assesses and contrasts the major home video game console platforms from several market share angles in the 2013–2022 period, with an emphasis on the 2021-2022 dynamic. Global market shares for Switch, Wii U, Wii, PlayStation 5, PlayStation 4, PlayStation 3, Xbox Series X/S, Xbox One, and Xbox 360 systems are tracked annually in several dimensions in this study. The impact of digital-only microconsoles, gaming-capable streaming media players, and smart TVs that support gaming services are briefly examined as well. "Given the smaller size of Microsoft's Xbox platform install base, it …
-kvě 2023 | Doc #US49472823 | Market Share
+Kyiv said air defences intercepted six Kinzhal hypersonic missiles, which Russia has claimed can overcome all existing air defence systems.
+
+They were among 18 missiles of different types fired at the city in a short space of time, officials said.
+
+Russia denies its Kinzhals were stopped and said one destroyed a US-supplied Patriot air defence system.
+
+Ukraine declined to comment. The BBC cannot independently verify the claims made by either country.
+
+Russia has stepped up its air campaign in recent weeks - bombarding the Ukrainian capital eight times so far this month - ahead of an expected Ukrainian offensive.
+
+On Tuesday evening Russian Defence Minister Sergei Shoigu said Moscow had not fired as many of the Kinzhal missiles as Kyiv had claimed to have shot down.
+
+However if Ukraine's claims are true, Moscow will be feeling frustrated that the finest weapons from its missile fleet are now able to be intercepted. This is in large part due to the arrival of modern Western defence systems, including Patriots.
+
+Russia continues to insist that the missiles, which it says can travel at more than 11,000kmh (7,000mph), cannot be destroyed by any of the world's air defence systems.
+
+The Kinzhal, or "dagger", is an air-launched ballistic missile. Most ballistic missiles reach hypersonic speed - five times the speed of sound, or just over 6,000 kmh - at some point during their flight.
+
+Kyiv said it shot down a Kinzhal for the first time last week.
+
+In the past few days, President Volodymyr Zelensky has been on a European tour in which he has been promised several billion dollars' worth of military equipment by Western allies, including UK Prime Minister Rishi Sunak and President Emmanuel Macron of France.
 """
-
-textProcessing = TextProcessing(
-    testText, OPENAI_API_KEY, OPENAI_API_ENGINE, OPENAI_CUSTOM_DOMAIN
-)
-
-print(textProcessing.stable_diffusion_prompt_generator([
+text_processor = text_processing()
+print(text_processor.text_to_tagged_prompt(
+    test_text,
+    [
     "realistic",
     # "50mm photography",
     "8k",
@@ -29,4 +47,5 @@ print(textProcessing.stable_diffusion_prompt_generator([
     "trending on artstation",
     # "movie concept art",
     "cinematic composition"
-]))
+    ]
+))
