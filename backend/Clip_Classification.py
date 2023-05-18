@@ -13,12 +13,11 @@ class Clip_classification(nn.Module):
             param.requires_grad = False
         self.classification_head = Classification_head(2).to(self.device)
 
-    def forward(self, text: torch.Tensor, image: torch.Tensor) -> None:
+    def forward(self, text: torch.Tensor, image: torch.Tensor) -> torch.Tensor:
         image_features = self.model.encode_image(image.to(self.device))
         text_features = self.model.encode_text(text.to(self.device))
         joint = torch.cat([image_features, text_features], dim=1)
-        x = self.classification_head(joint)
-        return x
+        return self.classification_head(joint)
 
     def tokenize(self, text) -> torch.Tensor:
         return clip.tokenize(text, truncate=True)
@@ -28,7 +27,7 @@ class Clip_classification(nn.Module):
 
 
 class Classification_head(nn.Module):
-    def __init__(self, num_classes=2) -> None:
+    def __init__(self, num_classes=2) -> torch.Tensor:
         super().__init__()
         self.layers = nn.Sequential(
             nn.Flatten(),
@@ -43,8 +42,7 @@ class Classification_head(nn.Module):
         )
 
     def forward(self, x):
-        x = self.layers(x.to(torch.float32))
-        return x
+        return self.layers(x.to(torch.float32))
 
 
 # Not used yet
@@ -69,5 +67,4 @@ class DeepConcatenationModel(nn.Module):
     def forward(self, text, img):
         text = self.text_layer(text)
         img = self.img_layer(img)
-        x = torch.cat([text, img], dim=1)
-        return x
+        return torch.cat([text, img], dim=1)
