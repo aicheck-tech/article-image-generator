@@ -1,5 +1,6 @@
 # Stefik_O ignores
 !lib
+!public
 
 # Logs
 logs
