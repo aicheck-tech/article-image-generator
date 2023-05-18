@@ -5,6 +5,7 @@ import logging
 
 import openai
 from dotenv import load_dotenv
+import tiktoken
 
 from settings import *
 
@@ -57,6 +58,11 @@ class TextProcessing:
         logger.debug(prompt)
         return prompt
 
+    def count_tokens(self, text:str) -> int:
+        encoding = tiktoken.get_encoding(OPENAI_ENCODING_NAME)
+        num_tokens = len(encoding.encode(text))
+        return num_tokens
+
     def summarize_text(self, text: str) -> str:
         """Summarize text using OpenAI API.
         Args:
@@ -66,7 +72,7 @@ class TextProcessing:
             str: The summarized text.
         """
 
-        logger.info("Summarizing text")
+        logger.info("Summarizing text %s.", text.replace("\n", "\n"))
 
         clean_batch = text.replace("\n", " ").strip()
 
@@ -81,11 +87,13 @@ class TextProcessing:
             }
         ])
 
+        MAX_TOKENS = self.count_tokens(prompt) + OPENAI_SUMMARIZATION_MAX_TOKENS
+        logger.info("Summarization max tokens: %s", MAX_TOKENS)
         response = openai.Completion.create(
             engine=self.OPENAI_API_ENGINE,
             prompt=prompt,
             temperature=0.7,
-            max_tokens=350,
+            max_tokens=MAX_TOKENS,
             top_p=0.95,
             frequency_penalty=0.3,
             presence_penalty=0,
@@ -93,19 +101,20 @@ class TextProcessing:
         
 
         logger.debug(response)
+        logger.info("Summarized text %s.", response["choices"][0]["text"])
         return response["choices"][0]["text"]
 
     def text_to_prompt(self, text: str, tags: List[str]) -> str:
         """Text to prompt ready for image generation.
 
         Args:
-            text (str): Text from article
-            tags (List[str]): List of tags to create more fitting prompt
+            text: Text from article
+            tags: List of tags to create more fitting prompt
 
         Returns:
             str: generated prompt
         """
-        logger.info("Generating prompt from text")
+        logger.info("Generating prompt from text %s.", text.replace("\n", "\n"))
 
         clean_batch = text.replace("\n", " ").strip()
         prompt = self._encode_prompt([
@@ -126,11 +135,13 @@ class TextProcessing:
             }
         ])
 
+        MAX_TOKENS = self.count_tokens(prompt) + OPENAI_TEXT_TO_PROMPT_MAX_TOKENS
+        logger.info("Text to prompt max tokens: %s", MAX_TOKENS)
         response = openai.Completion.create(
             engine=self.OPENAI_API_ENGINE,
             prompt=prompt,
             temperature=0,
-            max_tokens=256,
+            max_tokens=MAX_TOKENS,
             top_p=0.95,
             frequency_penalty=0,
             presence_penalty=0,
@@ -160,7 +171,7 @@ class TextProcessing:
 
         logger.info("Generating prompt from text and tags")
 
-        if (len(text.split(" ")) > 100):
+        if (self.count_tokens(text) > OPENAI_SUMMARIZE_TEXTS_LONGER_THAN_N_TOKENS):
             text = self.summarize_text(text)
         text_to_prompt = self.text_to_prompt(text, tags)
         

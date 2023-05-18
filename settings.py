@@ -1,4 +1,4 @@
-DEBUG=True
+DEBUG=False
 
 # FastAPI
 FASTAPI_PORT=8001
@@ -6,6 +6,10 @@ FASTAPI_WORKERS=1
 
 # OpenAI
 OPENAI_API_VERSION="2022-12-01"
+OPENAI_ENCODING_NAME="cl100k_base"
+OPENAI_SUMMARIZE_TEXTS_LONGER_THAN_N_TOKENS=100
+OPENAI_SUMMARIZATION_MAX_TOKENS=350
+OPENAI_TEXT_TO_PROMPT_MAX_TOKENS=256
 OPENAI_SUMMARIZE_SYSTEM_TEXT=(
                     "Act as a human, that summarizes given text to be as short as possible.\n"
                     )
