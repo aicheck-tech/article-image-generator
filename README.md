@@ -53,7 +53,6 @@ python main.py
 
 4. When first build is done, just run the python file
     - don't forget to be in virtual enviroment
-    - Add argument "--dev" for hot reload
 
 ```cmd
 python main.py

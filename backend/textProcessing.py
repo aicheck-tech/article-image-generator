@@ -13,7 +13,6 @@ OPENAI_CUSTOM_DOMAIN = os.getenv("OPENAI_CUSTOM_DOMAIN")
 
 logger = logging.getLogger(__name__)
 
-
 class TextProcessing:
     def __init__(self,
                  openai_api_key,
@@ -95,6 +94,15 @@ class TextProcessing:
         return response["choices"][0]["text"]
 
     def text_to_prompt(self, text: str, tags: List[str]) -> str:
+        """Text to prompt ready for image generation.
+
+        Args:
+            text (str): Text from article
+            tags (List[str]): List of tags to create more fitting prompt
+
+        Returns:
+            str: generated prompt
+        """
         logger.info("Generating prompt from text")
 
         clean_batch = text.replace("\n", " ").strip()
@@ -158,6 +166,7 @@ class TextProcessing:
         if (len(text.split(" ")) > 100):
             text = self.summarize_text(text)
         text_to_prompt = self.text_to_prompt(text, tags)
+        
         logging.info(text_to_prompt)
         return text_to_prompt
 
