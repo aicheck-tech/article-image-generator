@@ -1,28 +1,51 @@
-import sys
+import logging
+from pydantic import BaseModel
 
 import uvicorn
-
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-app = FastAPI()
+from backend.textProcessing import text_processing
+from settings import *
 
+if __name__ == "__main__":
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)s %(message)s',
+        level= logging.DEBUG if DEBUG == True else logging.INFO,
+        datefmt='%Y-%m-%d %H:%M:%S',
+        filename="fastapi-dev.log",
+        filemode="w"
+    )
+
+app = FastAPI()
 app.mount("/assets", StaticFiles(directory="public/assets"), name="static")
+
+text_processor = text_processing()
+
+class TextToPromptRequest(BaseModel):
+    text_for_processing: str
+    tags: list[str]
+
 
 @app.get("/", response_class=FileResponse)
 def main():
     return "public/index.html"
 
-def shutdown_handler(sig, frame):
-    print("Shutting down server...")
-    sys.exit(0)
+@app.post("/backend/text-to-prompts", response_class=JSONResponse)
+def text_to_prompt_response(
+                        text_and_tags: TextToPromptRequest
+                        ) -> JSONResponse:
+    text_for_processing = text_and_tags.text_for_processing
+    tags = text_and_tags.tags
+    prompt = text_processor.text_to_tagged_prompt(text_for_processing, tags)
+
+    return JSONResponse(status_code=200, content={"prompt": prompt})
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] in ('dev', '--dev', '-d'):
-        print("dev")
-        import signal
-        signal.signal(signal.SIGINT, shutdown_handler)
-        uvicorn.run("main:app", port=8001, reload=True, workers=1)
-    else:
-        uvicorn.run("main:app", port=8001, workers=1)
+    uvicorn.run(
+        "main:app", 
+        port=8001, 
+        workers=1
+        )

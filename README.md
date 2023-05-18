@@ -53,8 +53,75 @@ python main.py
 
 4. When first build is done, just run the python file
     - don't forget to be in virtual enviroment
-    - Add argument "--dev" for hot reload
 
 ```cmd
 python main.py
+```
+
+## scripts for testing
+### javascript
+```js
+const obj = { 
+    text_for_processing: "Yellow submarine with a red hat",
+    tags: [
+        "realistic",
+        "8k",
+        "octane render",
+        "cinematic",
+        "trending on artstation",
+        "cinematic composition"
+    ]
+};
+
+const request = new Request("/backend/textToPrompt", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(obj),
+});
+
+fetch(request).then((data) => {
+  console.log(data.json());
+});
+```
+
+### Curl:
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+  "text_for_processing": "Yellow submarine with a red hat",
+  "tags": [
+    "realistic",
+    "8k",
+    "octane render",
+    "cinematic",
+    "trending on artstation",
+    "cinematic composition"
+  ]
+}' http://127.0.0.1:8001/backend/text-to-prompts
+```
+
+### Powershell:
+```powershell
+$uri = "http://127.0.0.1:8001/backend/text-to-prompts"
+
+$headers = @{
+    "Content-Type" = "application/json"
+}
+
+$body = @{
+    "text_for_processing" = "Yellow submarine with a red hat"
+    "tags" = @(
+        "realistic",
+        "8k",
+        "octane render",
+        "cinematic",
+        "trending on artstation",
+        "cinematic composition"
+    )
+}
+
+$response = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -Body ($body | ConvertTo-Json)
+
+$response
 ```
