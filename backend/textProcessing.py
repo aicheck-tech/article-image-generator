@@ -1,10 +1,12 @@
 import os
 import re
-from typing import List
+from typing import List, Dict
 import logging
 
 import openai
 from dotenv import load_dotenv
+
+from settings import *
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -35,10 +37,10 @@ class TextProcessing:
 
         openai.api_type = "azure"
         openai.api_base = f"https://{self.OPENAI_CUSTOM_DOMAIN}.openai.azure.com/"
-        openai.api_version = "2022-12-01"
+        openai.api_version = OPENAI_API_VERSION
         openai.api_key = self.OPENAI_API_KEY
 
-    def _encode_prompt(self, messages) -> str:
+    def _encode_prompt(self, messages: List[Dict[str, str]]) -> str:
         """Defining a function to create the prompt from the system message and the messages."""
 
         logger.info("Encoding prompt")
@@ -46,6 +48,8 @@ class TextProcessing:
         prompt = ""
         message_template = "\n<|im_start|>{}\n{}\n<|im_end|>"
         for message in messages:
+            if message.get("content", "") == "":
+                raise ValueError("Content of message cannot be empty")
             prompt += message_template.format(
                 message['role'], message.get('content', ''))
         prompt += "\n<|im_start|>assistant\n"
@@ -69,9 +73,7 @@ class TextProcessing:
         prompt = self._encode_prompt([
             {
                 "role": "system",
-                "content": (
-                    "Act as a human, that summarizes given text to be as short as possible.\n"
-                )
+                "content": OPENAI_SUMMARIZE_SYSTEM_TEXT
             },
             {
                 "role": "user",
@@ -110,17 +112,12 @@ class TextProcessing:
             {
                 "role": "system",
                 "content": (
-                    "Generate a prompt for image generator based on text in variable called 'text':\n"
-                    "Two examples of good prompt:\n"
-                    "'prompt': 'Imagine a stunning woman standing in a garden surrounded by a riot of colorful blooms, with the sun setting in the distance. Use soft lighting to capture the warmth of the golden hour and the subtle nuances of her expression.'\n\n"
-                    "'prompt':  'a portrait of an old coal miner in 19th century, beautiful painting with highly detailed face by greg rutkowski and magali villanueve'\n\n"
-                    "Two examples of bad prompt:\n"
-                    "'prompt':  'Worldwide Wi-Fi Technology Forecast is a report that is likely to be a document consisting of text and graphs. The cover page may have the title in bold letters with a background color that is eye-catching. The report may be bound with a spiral or a perfect binding. The pages may be white with black text and colored graphs. The graphs may show the growth of Wi-Fi technology in different regions of the world. The report may be placed on a desk or a shelf in an office.'\n\n"
-                    "'prompt': 'SaaSPath 2023 is a list of various application categories including Banner Books, CPQ, Digital Commerce, Employee Experience, Facility Management, Field Service Management, PIM/PXM, and Procurement. It also includes information on adoption, deployment models, budget plans, replacement cycle timing, purchasing preferences, and attitudes towards SaaS buying channels. The report provides insights on packaging, pricing options, vendor reviews, ratings, spend, and advocacy scores for functional application markets.'\n\n"
-                    "If it's for paper or a study, generate prompt for some real physical object, that the study is about.\n\n"
+                    OPENAI_PROMPT_SYSTEM_TEXT +
+                    (
                     f"The design should be {', '.join(tags)}\n\n"
                     "Annotate it as:\n"
                     "'prompt': <the prompt>"
+                    )
                 )
             },
             {

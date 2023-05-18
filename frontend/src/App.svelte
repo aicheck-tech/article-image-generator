@@ -2,6 +2,10 @@
   import svelteLogo from './assets/svelte.svg'
   import viteLogo from './assets/vite.svg'
   import githubLogo from './assets/github-mark-white.svg'
+  import favicon from './assets/favicon.ico'
+
+    document.querySelector("link[rel*='icon']").href = favicon;
+
 </script>
 
 <main>
