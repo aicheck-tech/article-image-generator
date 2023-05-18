@@ -38,8 +38,7 @@ const crawler = new CheerioCrawler({
   useSessionPool: true,
   sessionPoolOptions: { maxPoolSize: 1 },
   persistCookiesPerSession: true,
-  requestHandler: async ({ $, request, enqueueLinks, proxyInfo }) => {
-    console.log(`Processing ${request.url}...`);
+  requestHandler: async ({ $, request, enqueueLinks}) => {
     // Navigation page
     const randomNumber = Math.floor(Math.random() * (1750 - 850 + 1)) + 850;
     await sleep(randomNumber);
@@ -53,7 +52,6 @@ const crawler = new CheerioCrawler({
         transformRequestFunction: labelFunc(ld.label),
       });
     } else {
-      console.log("Product page");
       const url = request.url;
       const title = $("#main-heading").text().trim();
 
