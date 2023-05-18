@@ -21,11 +21,10 @@ class Clip_classification(nn.Module):
         return x
 
     def tokenize(self, text) -> torch.Tensor:
-        return clip.tokenize(text)
+        return clip.tokenize(text, truncate=True)
 
-    def convert_img(self, path: str) -> torch.Tensor:
-        image = self.preprocess(Image.open(path)).unsqueeze(0)  # type: ignore
-        return image
+    def convert_img(self, image: Image) -> torch.Tensor:
+        return self.preprocess(image).unsqueeze(0)
 
 
 class Classification_head(nn.Module):
@@ -33,18 +32,18 @@ class Classification_head(nn.Module):
         super().__init__()
         self.layers = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(1024, 512).to(torch.float16),
+            nn.Linear(1024, 512),
             nn.ReLU(),
             nn.Dropout(0.5),
-            nn.Linear(512, 256).to(torch.float16),
+            nn.Linear(512, 256),
             nn.ReLU(),
-            nn.Linear(256, 128).to(torch.float16),
+            nn.Linear(256, 128),
             nn.ReLU(),
-            nn.Linear(128, num_classes).to(torch.float16)
+            nn.Linear(128, num_classes)
         )
 
     def forward(self, x):
-        x = self.layers(x)
+        x = self.layers(x.to(torch.float32))
         return x
 
 
