@@ -15,27 +15,37 @@ import train_settings
 logging.getLogger().setLevel(logging.INFO)
 
 
-def calculate_acc_loss_avg(corrects, loss, batch_num, lossFn, prediction, label):
+def calculate_acc_loss_avg(corrects: int,
+                           loss: float,
+                           batch_num: int,
+                           loss_fn,
+                           prediction: torch.Tensor,
+                           label: torch.Tensor
+                           ):
     """ Calculates the accuracy and loss of the model,
         by averaging the loss and accuracy of the model"""
-    loss += lossFn(prediction, label)
-    corrects += ((1 / (batch_num + 1)) * (loss.item() - corrects))
-    return corrects, loss
+    new_loss = loss + loss_fn(prediction, label)
+    new_corrects = corrects + ((1 / (batch_num + 1)) * (new_loss.item() - corrects))
+    return new_corrects, new_loss
 
 
-def calculate_acc_loss_press(corrects, loss, lossFn, prediction, label):
+def calculate_acc_loss_press(corrects: int,
+                             loss: float,
+                             loss_fn,
+                             prediction: torch.Tensor,
+                             label: torch.Tensor
+                             ):
     """ Calculates the accuracy and loss of the model,
         if model prediction is correct"""
     if torch.argmax(prediction) == label:
         corrects += 1
-    loss += lossFn(prediction, label)
-    return corrects, loss
+    new_loss = loss + loss_fn(prediction, label)
+    return corrects, new_loss
 
 
 def train(train_loader, loss_fn, optimizer, model) -> None:
     model.train()
     data_size = len(train_loader.dataset)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     for batch, (texts, images, labels) in enumerate(train_loader):
         texts = texts.to(device)
         images = images.to(device)
@@ -52,7 +62,6 @@ def train(train_loader, loss_fn, optimizer, model) -> None:
 
 
 def test(model, data_loader, loss_fn) -> None:
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     data_size = len(data_loader.dataset)
     num_batches = len(data_loader)
     model.eval()
@@ -87,14 +96,27 @@ def test(model, data_loader, loss_fn) -> None:
 def load_dataset(dataset: str):
     """ Loads the dataset from the json file,
         and splits it into train and test data"""
-    def collate_fn(data):
-        titles, texts, images, labels = zip(
-            *[(d['title'], d['text'], d['imgURL'], d['label']) for d in data])
+    def collate_fn(data: list):
+        titles = [doc['title'] for doc in data]
+        texts = [doc['text'] for doc in data]
+        image_urls = [doc['imgURL'] for doc in data]
+        labels = [doc['label'] for doc in data]
         texts = [f"{title}\n{text}" for title, text in zip(titles, texts)]
+
+        image_list = []
+        for img in image_urls:
+            try:
+                response = requests.get(img)
+                response.raise_for_status()
+                image = Image.open(io.BytesIO(response.content))
+                image_list.append(image)
+            except requests.exceptions.RequestException as e:
+                logging.info(f"Error occurred while downloading image: {img}")
+                logging.info(e)
+                pass
+
         batch_text = [model.tokenize(text) for text in texts]
-        images = [Image.open(io.BytesIO(requests.get(img).content))
-                  for img in images]
-        batch_images = [model.convert_img(img) for img in images]
+        batch_images = [model.convert_img(img) for img in image_list]
         batch_labels = torch.tensor(labels)
         return torch.concat(batch_text), torch.concat(batch_images), batch_labels
 
@@ -143,7 +165,6 @@ def start_test(model, train_dataloader: DataLoader, test_dataloader: DataLoader)
 
 if __name__ == "__main__":
     # CLI for fast training and testing and example testing
-
     def get_args():
         parser = argparse.ArgumentParser(description='Train.py Argument Parser')
         parser.add_argument('--path-to-model', type=str, help='Path to the model')
@@ -154,13 +175,17 @@ if __name__ == "__main__":
                             help='Mode: "train" to train the model, "test" to test the model')
         return parser.parse_args()
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = ClipClassification()
     train_dataloader, test_dataloader = load_dataset("bbc")
     output = "model.pth"
     learning_rate = 1e-3
     args = get_args()
     if args.path_to_model:
-        model = model.load_state_dict(torch.load(args.path_to_model))
+        try:
+            model = model.load_state_dict(torch.load(args.path_to_model))
+        except FileNotFoundError:
+            logging.info("Model not found")
     if args.dataset:
         train_dataloader, test_dataloader = load_dataset(args.dataset)
     if args.output_path:

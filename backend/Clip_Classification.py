@@ -11,7 +11,7 @@ class ClipClassification(nn.Module):
         self.model, self.preprocess = clip.load("ViT-B/32", device=self.device)
         for param in self.model.parameters():
             param.requires_grad = False
-        self.classification_head = ClassificationHead(2).to(self.device)
+        self.classification_head = ClassificationHead(num_classes=2).to(self.device)
 
     def forward(self, text: torch.Tensor, image: torch.Tensor) -> torch.Tensor:
         image_features = self.model.encode_image(image.to(self.device))
