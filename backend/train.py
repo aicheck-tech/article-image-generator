@@ -12,6 +12,9 @@ from clip_classification import ClipClassification
 import train_settings
 
 
+logging.getLogger().setLevel(logging.INFO)
+
+
 def calculate_acc_loss_avg(corrects, loss, batch_num, lossFn, prediction, label):
     """ Calculates the accuracy and loss of the model,
         by averaging the loss and accuracy of the model"""
@@ -44,7 +47,7 @@ def train(train_loader, loss_fn, optimizer, model) -> None:
         optimizer.step()
         if batch % 100 == 0:
             progress = batch * len(labels)
-            log = f"loss: {loss:>8f}, [{progress:>5f}/{data_size:>5f}]\n"
+            log = f"\tloss: {loss:>8f}, [{progress:>5f}/{data_size:>5f}]\n"
             logging.info(log)
 
 
@@ -75,10 +78,8 @@ def test(model, data_loader, loss_fn) -> None:
     loss2 /= num_batches
     correct /= data_size
     correct2 /= data_size
-    log = f"Results: \n Test Error: {(100*correct):>0.1f}% \
-            , Avg loss: {loss:>8f}\n \
-            My Accuracy: {(100*correct2):>0.1f}% \
-            , Avg loss: {loss2:>8f}\n"
+    log = f"\nResults: \n\tTest Error: {(100*correct):>0.1f}%, Avg loss: {loss:>8f}\n" \
+          f"\tMy Accuracy: {(100*correct2):>0.1f}%, Avg loss: {loss2:>8f}\n"
     logging.info(log)
     return correct, loss, correct2, loss2
 
@@ -149,6 +150,8 @@ if __name__ == "__main__":
         parser.add_argument('--dataset', type=str, help='Dataset name')
         parser.add_argument('--output-path', type=str, help='Output path')
         parser.add_argument('--lr', type=float, help='Learning rate')
+        parser.add_argument('--mode', choices=['train', 'test'],
+                            help='Mode: "train" to train the model, "test" to test the model')
         return parser.parse_args()
 
     model = ClipClassification()
@@ -160,15 +163,12 @@ if __name__ == "__main__":
         model = model.load_state_dict(torch.load(args.path_to_model))
     if args.dataset:
         train_dataloader, test_dataloader = load_dataset(args.dataset)
-    if args.output:
-        output = args.output
-    if args.learning_rate:
-        learning_rate = args.learning_rate
-    if len(args) > 1:
-        if args[1] == "train":
-            start_train(model, train_dataloader,
-                        test_dataloader, output, learning_rate)
-        elif args[1] == "test":
-            start_test(model, train_dataloader, test_dataloader)
+    if args.output_path:
+        output = args.output_path
+    if args.lr:
+        learning_rate = args.lr
+    if args.mode == "train":
+        start_train(model, train_dataloader,
+                    test_dataloader, output, learning_rate)
     else:
         start_test(model, train_dataloader, test_dataloader)
