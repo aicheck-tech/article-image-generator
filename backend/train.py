@@ -8,36 +8,15 @@ from torch.utils.data import DataLoader
 import anlys
 from Clip_Classification import Clip_classification
 
-clip = Clip_classification()
-optimizer = torch.optim.Adam(clip.parameters(), lr=1e-4)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1, gamma=0.9)
-loss_fn = torch.nn.CrossEntropyLoss()
-
-json_data = anlys.load("backend/data/BBC_dataset.jsonl")
-
-train_data, test_data = anlys.split_data(json_data, 0.9)
 
 def collate_fn(data):
     titles, texts, images, labels = zip(*[(d['title'], d['text'], d['imgURL'], d['label']) for d in data])
-    batch_text = torch.concat([clip.tokenize(f"{title}\n{text}") for title, text in zip(titles, texts)])
-    batch_images = torch.concat([clip.convert_img(Image.open(io.BytesIO(get(img).content))) for img in images])
+    texts = [f"{title}\n{text}" for title, text in zip(titles, texts)]
+    batch_text = [clip.tokenize(text) for text in texts]
+    images = [Image.open(io.BytesIO(get(img).content)) for img in images]
+    batch_images = [clip.convert_img(img) for img in images]
     batch_labels = torch.tensor(labels)
-    return batch_text, batch_images, batch_labels
-
-
-train_dataloader = DataLoader(
-    dataset=train_data,
-    batch_size=1,
-    shuffle=True,
-    collate_fn=collate_fn,
-)
-
-test_dataloader = DataLoader(
-    dataset=test_data,
-    batch_size=1,
-    shuffle=True,
-    collate_fn=collate_fn,
-)
+    return torch.concat(batch_text), torch.concat(batch_images), batch_labels
 
 
 def calculate_acc_loss_avg(corrects, loss, batch_num, lossFn, prediction, label):
@@ -59,19 +38,19 @@ def train(train_loader, loss_fn, optimizer, scheduler, model) -> None:
     data_size = len(train_loader.dataset)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     for batch, (texts, images, labels) in enumerate(train_loader):
-    texts = texts.to(device)
-    images = images.to(device)
-    labels = labels.to(device)
-    prediction = model(texts, images)
-    loss = loss_fn(prediction, labels)
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-    if batch % 100 == 0:
-        loss, progress = loss, batch * len(labels)
-        log = f"loss: {loss:>8f}, [{progress:>5f}/{data_size:>5f}]\n"
-        scheduler.step()
-        print(log)
+        texts = texts.to(device)
+        images = images.to(device)
+        labels = labels.to(device)
+        prediction = model(texts, images)
+        loss = loss_fn(prediction, labels)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        if batch % 100 == 0:
+            loss, progress = loss, batch * len(labels)
+            log = f"loss: {loss:>8f}, [{progress:>5f}/{data_size:>5f}]\n"
+            scheduler.step()
+            print(log)
 
 
 def test(model, data_loader, loss_fn) -> None:
@@ -104,6 +83,29 @@ def test(model, data_loader, loss_fn) -> None:
 
 
 if __name__ == "__main__":
+    clip = Clip_classification()
+    optimizer = torch.optim.Adam(clip.parameters(), lr=1e-4)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1, gamma=0.9)
+    loss_fn = torch.nn.CrossEntropyLoss()
+
+    json_data = anlys.load("backend/data/BBC_dataset.jsonl")
+
+    train_data, test_data = anlys.split_data(json_data, 0.9)
+    
+    train_dataloader = DataLoader(
+        dataset=train_data,
+        batch_size=1,
+        shuffle=True,
+        collate_fn=collate_fn,
+    )
+
+    test_dataloader = DataLoader(
+        dataset=test_data,
+        batch_size=1,
+        shuffle=True,
+        collate_fn=collate_fn,
+    )
+
     test(clip, test_dataloader, loss_fn)
     test(clip, train_dataloader, loss_fn)
 
