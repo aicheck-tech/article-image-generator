@@ -41,12 +41,15 @@ class Classification_head(nn.Module):
             nn.Linear(128, num_classes)
         )
 
-    def forward(self, x):
+    def forward(self, x) -> torch.Tensor:
         return self.layers(x.to(torch.float32))
 
 
-# Not used yet
 class DeepConcatenationModel(nn.Module):
+    """
+    Concatenates the text and image features after passing them through a few layers
+    Not used yet, but might be useful in the future.
+    """
     def __init__(self) -> None:
         super().__init__()
         self.text_layer = nn.Sequential(
@@ -64,7 +67,7 @@ class DeepConcatenationModel(nn.Module):
             nn.Linear(768, 1024),
             )
 
-    def forward(self, text, img):
+    def forward(self, text, img) -> torch.Tensor:
         text = self.text_layer(text)
         img = self.img_layer(img)
         return torch.cat([text, img], dim=1)

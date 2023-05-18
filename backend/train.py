@@ -1,39 +1,21 @@
-import json
 from PIL import Image
 from requests import get
 import io
+
 import torch
 from torch.utils.data import DataLoader
 
+import anlys
 from Clip_Classification import Clip_classification
-
-
-def load(path):
-    file = []
-    with open(path, 'r', encoding="utf-8") as f:
-        for line in f:
-            file.append(json.loads(line))
-    return file
-
-
-def split_data(data, ratio):
-    train_data = []
-    test_data = []
-    for i in range(len(data)):
-        if i < len(data) * ratio:
-            train_data.append(data[i])
-        else:
-            test_data.append(data[i])
-    return train_data, test_data
 
 clip = Clip_classification()
 optimizer = torch.optim.Adam(clip.parameters(), lr=1e-4)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1, gamma=0.9)
 loss_fn = torch.nn.CrossEntropyLoss()
 
-json_data = load("backend/data/BBC_dataset.jsonl")
+json_data = anlys.load("backend/data/BBC_dataset.jsonl")
 
-train_data, test_data = split_data(json_data, 0.9)
+train_data, test_data = anlys.split_data(json_data, 0.9)
 
 def collate_fn(data):
     titles, texts, images, labels = zip(*[(d['title'], d['text'], d['imgURL'], d['label']) for d in data])
@@ -73,10 +55,10 @@ def calculate_acc_loss_press(corrects, loss, lossFn, prediction, label):
 
 
 def train(train_loader, loss_fn, optimizer, scheduler, model) -> None:
-  model.train()
-  data_size = len(train_loader.dataset)
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  for batch, (texts, images, labels) in enumerate(train_loader):
+    model.train()
+    data_size = len(train_loader.dataset)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    for batch, (texts, images, labels) in enumerate(train_loader):
     texts = texts.to(device)
     images = images.to(device)
     labels = labels.to(device)
@@ -121,12 +103,12 @@ def test(model, data_loader, loss_fn) -> None:
     return correct, loss, correct2, loss2
 
 
-test(clip, test_dataloader, loss_fn)
-test(clip, train_dataloader, loss_fn)
+if __name__ == "__main__":
+    test(clip, test_dataloader, loss_fn)
+    test(clip, train_dataloader, loss_fn)
 
+    train(train_dataloader, loss_fn, optimizer, scheduler, clip)
+    torch.save(clip.state_dict(), "clip.pth")
 
-train(train_dataloader, loss_fn, optimizer, scheduler, clip)
-torch.save(clip.state_dict(), "clip.pth")
-
-test(clip, test_dataloader, loss_fn)
-test(clip, train_dataloader, loss_fn)
+    test(clip, test_dataloader, loss_fn)
+    test(clip, train_dataloader, loss_fn)
