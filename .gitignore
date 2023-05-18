@@ -3,6 +3,13 @@ public
 *.local
 *.vscode
 
+# Dzeniks ignores
+*.json
+*.jsonl
+*.pth
+*.pt
+node_modules/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
