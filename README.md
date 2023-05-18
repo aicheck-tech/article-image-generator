@@ -57,3 +57,30 @@ python main.py
 ```cmd
 python main.py
 ```
+
+## script for testing
+```js
+const obj = { 
+    text_for_processing: "IDC Government Insights: Worldwide Railways and Airlines IT Strategies empowers executives in railway operators, railway infrastructure companies and airlines to make evidence-based decisions about the future of customer experience, revenue management and net-zero, safe, and resilient operations. The service will enable executives to understand how technology will impact ticketing, booking, revenue management, linear asset and fleet maintenance and operations and trigger innovative collaborations across the passenger transportation ecosystem. Markets and Subjects Analyzed Connected customer experience Revenue innovation and management Safe, sustainable, and resilient operations Core Next-generation ticketing and revenue management in railways and airlines IDC MarketScape: European Digital Twin Professional Services for the Transportation Ecosystem Vendor Assessment The power of digital and data in the air travel ecosystem FRMCS: the power of 5G for the railway industry In addition to the insight provided in this service, IDC may conduct research on specific topics or emerging market segments via research offerings that require additional IDC funding and client investment. Key Questions Answered How will technology innovation trigger change in the future of railway and airline customer experience? How will technology innovation enable railways and airlines to save fuel/energy, and increase employee productivity, while maintaining high safety standards? How can technology suppliers reimagine their portfolio and go-to-market to be best positioned to deliver successful solutions in the future of railways and airlines? How will railways and airlines work with the passenger transportation ecosystem to enable end-to-end mobility as a service experience? What are the organizational change, security, technical, legal, and project management challenges that need to be addressed to unleash the benefits of technology innovation for railways and airlines?",
+    tags: [
+        "realistic",
+        "8k",
+        "octane render",
+        "cinematic",
+        "trending on artstation",
+        "cinematic composition"
+    ]
+};
+
+const request = new Request("/backend/textToPrompt", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(obj),
+});
+
+fetch(request).then((data) => {
+  console.log(data.json());
+});
+```
