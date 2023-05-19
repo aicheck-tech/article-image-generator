@@ -3,7 +3,6 @@ from pathlib import Path
 import os
 import io
 from typing import List, Dict, Tuple
-import logging
 import base64
 import json
 
@@ -11,9 +10,7 @@ import torch
 from dotenv import load_dotenv
 import requests
 import PIL
-import numpy as np
 
-from stable_diffusion import StableDiffusion
 from textProcessing import text_processing
 import clip_classification
 import settings
@@ -114,14 +111,8 @@ class Main:
         # Remove the "data:image/jpeg;base64," prefix if present
         if base64_string.startswith("data:image"):
             _, base64_string = base64_string.split(",", 1)
-
-        # Decode the base64 string into bytes
         image_bytes = base64.b64decode(base64_string)
-
-        # Create a BytesIO object and wrap it with io.BufferedReader for efficiency
         image_buffer = io.BufferedReader(io.BytesIO(image_bytes))
-
-        # Open the image using PIL
         image = PIL.Image.open(image_buffer)
         return image
 
