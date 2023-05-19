@@ -71,3 +71,10 @@ class DeepConcatenationModel(nn.Module):
         text_vector = self.text_layer(text)
         img_vector = self.img_layer(img)
         return torch.cat([text_vector, img_vector], dim=1)
+
+
+def load_classifiear() -> ClipClassification:
+        classifier = ClipClassification()
+        classifier.eval()
+        # classifier.load_state_dict(torch.load("model.pth"))
+        return classifier

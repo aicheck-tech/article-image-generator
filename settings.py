@@ -1,4 +1,8 @@
+from pathlib import Path
+
 DEBUG=False
+
+BACKEND_LOG_PATH = Path("backend/logs")
 
 # FastAPI
 FASTAPI_PORT=8001
@@ -24,3 +28,19 @@ OPENAI_PROMPT_SYSTEM_TEXT=(
                     "'prompt': 'SaaSPath 2023 is a list of various application categories including Banner Books, CPQ, Digital Commerce, Employee Experience, Facility Management, Field Service Management, PIM/PXM, and Procurement. It also includes information on adoption, deployment models, budget plans, replacement cycle timing, purchasing preferences, and attitudes towards SaaS buying channels. The report provides insights on packaging, pricing options, vendor reviews, ratings, spend, and advocacy scores for functional application markets.'\n\n"
                     "If it's for paper or a study, generate prompt for some real physical object, that the study is about.\n\n"  
                     )
+
+# Stable Diffusion
+STABLE_DIFFUSION_MODEL_PATH="stabilityai/stable-diffusion-2-1"
+
+# DreamStudio API - Stable Diffusion
+STABILITY_ENGINE="stable-diffusion-512-v2-1"
+STABILITY_GENERATION_URL = f"https://api.stability.ai/v1/generation/{STABILITY_ENGINE}/text-to-image"
+
+
+# Train settings
+TRAIN_TEST_SPLIT_RATIO = 0.9
+BATCH_SIZE = 1
+
+DATASETS = {
+    "bbc": "Dzeniks/BBC-article"
+}

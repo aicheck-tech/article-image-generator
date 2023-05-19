@@ -2,10 +2,15 @@ import os
 import re
 from typing import List, Dict
 import logging
+from pathlib import Path
+import sys
 
 import openai
 from dotenv import load_dotenv
 import tiktoken
+
+parent_folder = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(parent_folder))
 
 from settings import *
 

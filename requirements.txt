@@ -11,14 +11,17 @@ tiktoken
 torch
 torchvision
 
-# Dzeniks - stable-diffusion
+# transformers
+datasets
+
+# stable-diffusion
 diffusers
 transformers
 accelerate
 scipy
 safetensors
 
-# Dzeniks - CLIP-OpenAI
+# CLIP-OpenAI
 ftfy
 regex
 tqdm

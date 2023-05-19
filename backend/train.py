@@ -2,14 +2,21 @@ import argparse
 from PIL import Image
 import io
 import logging
+import sys
+from pathlib import Path
 
 import requests
 import torch
+import datasets 
 from torch.utils.data import DataLoader
 
 import anlys
 from clip_classification import ClipClassification
-import train_settings
+
+parent_folder = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(parent_folder))
+
+import settings
 
 
 logging.getLogger().setLevel(logging.INFO)
@@ -120,14 +127,13 @@ def load_dataset(dataset: str):
         batch_labels = torch.tensor(labels)
         return torch.concat(batch_text), torch.concat(batch_images), batch_labels
 
-    json_data = anlys.load_json_to_list(train_settings.DATASETS[dataset])
+    train_data = datasets.load_dataset(settings.DATASETS[dataset], split="train")
+    test_data = datasets.load_dataset(settings.DATASETS[dataset], split="test")
 
-    train_data, test_data = anlys.split_data(
-        json_data, train_settings.TRAIN_TEST_SPLIT_RATIO)
 
     train_dataloader = DataLoader(
         dataset=train_data,
-        batch_size=train_settings.BATCH_SIZE,
+        batch_size=settings.BATCH_SIZE,
         shuffle=True,
         collate_fn=collate_fn,
     )
@@ -179,7 +185,7 @@ if __name__ == "__main__":
     model = ClipClassification()
     train_dataloader, test_dataloader = load_dataset("bbc")
     output = "model.pth"
-    learning_rate = 1e-3
+    learning_rate = 1e-4
     args = get_args()
     if args.path_to_model:
         try:
