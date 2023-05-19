@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Flow+Circular&display=swap');
+
 :root {
     --color-primary: 43, 43, 43;
     --color-secondary: 36, 36, 36;
@@ -5,7 +7,7 @@
     --color-text: 255, 255, 255;
     --color-highlight: 255, 255, 255;
     
-    --border-radius: 10px;
+    --border-radius: 5px;
 
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -92,11 +94,15 @@ button:focus-visible {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(var(--color-highlight), 0.25);
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(var(--color-highlight), 0.05);
   border-radius: 8px;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: transparent;
 }

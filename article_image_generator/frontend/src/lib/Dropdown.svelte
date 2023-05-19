@@ -1,13 +1,24 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+
     export let default_item: string;
     export let tags: string[];
-    let current_tag = tags[default_item];
+    export let border_radius: string = "var(--border-radius)";
 
-    import arrow_forward from "../assets/icons/arrow_forward_FILL.png";
+    import arrow_forward from "../assets/icons/arrow_forward_fill.png";
     import design_services from "../assets/icons/design_services_fill.png";
+    
+    let current_tag = tags[default_item];
+    let dropdown;
+
+    onMount(() => {
+        dropdown.setAttribute("tabindex", "0");
+        const dropdown_content:HTMLDivElement = dropdown.querySelector(".dropdown-content");
+
+    });
 </script>
 
-<div class="dropdown">
+<div class="dropdown" bind:this={dropdown} style="border-radius: {border_radius};">
     <div class="group">
         <img src={design_services} alt="design_services" />
         <span>Look: {current_tag}</span>
@@ -16,7 +27,7 @@
     <div class="dropdown-content">
         {#each tags as tag}
             <label class="tag">
-                <input type="radio" name="tags" value={tag} bind:group={current_tag} />
+                <input tabindex="0" type="radio" name="tags" value={tag} bind:group={current_tag} />
                 {tag}
             </label>
         {/each}
@@ -79,6 +90,13 @@
         animation: growDown 150ms ease-in-out forwards;
         transform-origin: top left;
     }
+
+    .dropdown:focus .dropdown-content {
+        display: block;
+
+        animation: growDown 150ms ease-in-out forwards;
+        transform-origin: top left;
+    }   
 
     .tag {
         display: block;

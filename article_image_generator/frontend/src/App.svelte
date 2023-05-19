@@ -2,9 +2,9 @@
     import { onMount } from "svelte";
 
     import Dropdown from "./lib/Dropdown.svelte";
-    import ResizableArea from "./lib/ResizableArea.svelte";
 
     import favicon from "./assets/favicon.ico";
+    import OutputImageSection from "./lib/OutputImageSection.svelte";
 
     var link = document.querySelector("link[rel~='icon']");
     if (!link) {
@@ -17,78 +17,39 @@
     const tags = ["realistic", "cinematic", "cartoon", "sketch"];
     let default_item = 0;
 
-    let left;
-    let resizer;
-    let container;
-    let x = 0;
-    let y = 0;
-    let leftWidth = 0;
-    const MINWIDTH = 50;
-
-    const mouseDownHandler = (e) => {
-        x = e.clientX;
-        y = e.clientY;
-        leftWidth = left.getBoundingClientRect().width;
-
-        document.addEventListener("mousemove", mouseMoveHandler);
-        document.addEventListener("mouseup", mouseUpHandler);
-    };
-
-    const mouseMoveHandler = (e) => {
-        const dx = e.clientX - x;
-        const newLeftWidth =
-            ((leftWidth + dx) * 100) /
-            resizer.parentNode.getBoundingClientRect().width;
-        left.style.width = `${newLeftWidth}%`;
-    };
-
-    const mouseUpHandler = () => {
-        resizer.style.removeProperty("cursor");
-        document.body.style.removeProperty("cursor");
-        left.style.removeProperty("user-select");
-        left.style.removeProperty("pointer-events");
-
-        document.removeEventListener("mousemove", mouseMoveHandler);
-        document.removeEventListener("mouseup", mouseUpHandler);
-    };
-
-    onMount(() => {
-        left = document.querySelector(".input-area");
-        resizer = document.querySelector(".resize-bar");
-        container = document.querySelector(".input-section");
-
-        resizer.addEventListener("mousedown", mouseDownHandler);
-
-        return () => {
-            resizer.removeEventListener("mousedown", mouseDownHandler);
-            document.removeEventListener("mousemove", mouseMoveHandler);
-            document.removeEventListener("mouseup", mouseUpHandler);
-        };
-    });
 </script>
 
 <main>
-    <section class="title-section">
+    <section class="title-panel">
         <h1>Article image generator</h1>
         <h2>Generate images for articles</h2>
     </section>
-    <section class="input-section">
-        <section class="input-area">
-            <textarea class="resizable-textarea" />
-            
-            <Dropdown default_item={default_item} tags={tags} />
 
-            <button>Imagine</button>
+    <section class="input-panel">
+        <textarea class="article-textarea group" placeholder="Insert you article here..." />
+        
+        <section class="group input-panel-settings">
+            <Dropdown border_radius="var(--border-radius) var(--border-radius) 0 0" default_item={default_item} tags={tags} />
+            <button style="border-radius: 0 0 var(--border-radius) var(--border-radius)">Imagine</button>
         </section>
-        <div class="resize-bar" id="resize" />
     </section>
+
+    <output class="output-panel">
+        <OutputImageSection></OutputImageSection>
+        <OutputImageSection image="https://picsum.photos/512/512">
+            <span slot="prompt">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.</span>
+        </OutputImageSection>
+        <OutputImageSection image="https://picsum.photos/512/512">
+            <span slot="prompt">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.</span>
+        </OutputImageSection>
+    </output>
 </main>
 
 <style>
     main {
         display: grid;
         grid-template-rows: fit-content(1ch) 1fr;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: fit-content(1ch) 1fr;
 
         width: 100vw;
         height: 100vh;
@@ -98,9 +59,10 @@
 
     button {
         border-radius: 0;
+        width: 100%;
     }
 
-    .title-section {
+    .title-panel {
         grid-row: 1;
         grid-column: 1 / 3;
 
@@ -121,59 +83,76 @@
         text-align: left;
     }
 
-    .input-section {
+    .input-panel {
         grid-row: 2;
         grid-column: 1;
 
-        width: 100%;
-        height: 100%;
-
-        min-width: 10em;
-
-        display: flex;
-        flex-direction: row;
-    }
-
-    .input-area {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
+        gap: -0.5em;
 
-        min-width: 12em;
-        max-width: 25em;
-        width: 20em;
+        width: fit-content;
+        height:100%;
 
+        box-sizing: border-box;
+
+        border-right: 2px solid rgb(var(--color-tertiary));
+    }
+
+    .group {
         box-sizing: border-box;
     }
 
-    .input-area > * {
-        box-sizing: border-box;
-    }
+    .article-textarea {
+        resize: both;
+        overflow: auto;
 
-
-    .input-section > * {
-        box-sizing: border-box;
-    }
-
-    .resize-bar {
-        width: 2px;
-        height: 100%;
-
-        cursor: col-resize;
-
-        background: rgba(var(--color-tertiary), 0.5);
-
-        transition: 0.2s ease-in-out;
-    }
-
-    .resizable-textarea {
-        width: 100%;
-
-        min-height: 4em;
-        max-height: 40em;
+        width: 15rem;
+        min-width: 12rem;
+        max-width: 25rem;
 
         height: 50%;
+        min-height: 12rem;
+        max-height: 69vh;
 
-        resize: vertical;
+        margin: 0.5em;
+        padding: 0.5em;
+
+        background: rgb(var(--color-secondary));
+
+        border: 2px solid rgb(var(--color-tertiary));
+        border-radius: var(--border-radius);
+    }
+
+    .article-textarea::placeholder {
+        color: rgba(var(--color-text), 0.5);
+    }
+
+    .article-textarea:focus {
+        border: 2px solid rgba(var(--color-text), 0.4);
+        outline: none;
+    }
+
+    .input-panel-settings {
+        display: flex;
+        flex-direction: column;
+        
+        justify-content: space-between;
+
+        margin: 0.5em;
+    }
+
+    .output-panel {
+        grid-row: 2;
+        grid-column: 2;
+
+        background: rgb(var(--color-primary));
+
+        display: flex;
+        flex-direction: column;
+
+        box-sizing: border-box;
+        overflow-y: scroll;
     }
 </style>
