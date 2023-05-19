@@ -117,6 +117,6 @@ class ArticleImageGenerator:
         image_buffer = io.BufferedReader(io.BytesIO(image_bytes))
         return PIL.Image.open(image_buffer)
 
-
+@service
 def load_pipeline() -> ArticleImageGenerator:
     return ArticleImageGenerator(stability_api_key=STABILITY_API_KEY)
