@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from backend.textProcessing import text_processing
+from backend.text_processing import text_processing
 from settings import *
 
 if __name__ == "__main__":

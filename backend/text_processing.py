@@ -9,10 +9,16 @@ import openai
 from dotenv import load_dotenv
 import tiktoken
 
+from settings import (
+    OPENAI_API_VERSION, OPENAI_ENCODING_NAME, OPENAI_SUMMARIZE_SYSTEM_TEXT,
+    OPENAI_SUMMARIZATION_MAX_TOKENS, OPENAI_PROMPT_SYSTEM_TEXT, OPENAI_TEXT_TO_PROMPT_MAX_TOKENS,
+    OPENAI_SUMMARIZE_TEXTS_LONGER_THAN_N_TOKENS
+)
+
+
 parent_folder = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(parent_folder))
 
-from settings import *
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -156,8 +162,7 @@ class TextProcessing:
         logger.debug(response)
         answer = response["choices"][0]["text"]
         
-        result = re.search(
-            r"^'prompt': (.*)$", answer)
+        result = re.search(r"^'prompt': (.*)$", answer)
         
         return {"prompt": result.group(1)}
 
@@ -176,7 +181,7 @@ class TextProcessing:
 
         logger.info("Generating prompt from text and tags")
 
-        if (self.count_tokens(text) > OPENAI_SUMMARIZE_TEXTS_LONGER_THAN_N_TOKENS):
+        if self.count_tokens(text) > OPENAI_SUMMARIZE_TEXTS_LONGER_THAN_N_TOKENS:
             text = self.summarize_text(text)
         text_to_prompt = self.text_to_prompt(text, tags)
         

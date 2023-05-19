@@ -1,19 +1,21 @@
-import sys
-from pathlib import Path
-import os
-import io
-from typing import List, Dict, Tuple, Union
 import base64
 import json
+import io
+import os
+import sys
+from pathlib import Path
+from typing import List, Dict, Tuple, Union
 
+import PIL
+import requests
 import torch
 from dotenv import load_dotenv
-import requests
-import PIL
 
-from textProcessing import text_processing
 import clip_classification
 import settings
+from backend.errors import BadPromptError
+from text_processing import text_processing
+
 
 parent_folder = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(parent_folder))
@@ -24,7 +26,7 @@ STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
 
 
 class ArticleImageGenerator:
-    def __init__(self, stability_api_key: str = STABILITY_API_KEY):
+    def __init__(self, stability_api_key: str):
         self.classifier = clip_classification.load_classifiear()
         self.text_processor = text_processing()
         self.stability_api_key = stability_api_key
@@ -72,7 +74,7 @@ class ArticleImageGenerator:
             counter += 1
         return save_path
 
-    def _classify(self, img, text):
+    def _classify(self, img: PIL.Image.Image, text: str) -> torch.Tensor:
         """
         Classifies the text and image and returns the similarity
         """
@@ -87,7 +89,6 @@ class ArticleImageGenerator:
                                             height: int = 512,
                                             width: int = 512,
                                             steps: int = 20) -> PIL.Image.Image:
-
         response = requests.post(
             settings.STABILITY_GENERATION_URL,
             headers={
@@ -110,20 +111,20 @@ class ArticleImageGenerator:
         )
 
         if response.status_code != 200:
-            raise Exception("Non-200 response: " + str(response.text))
+            raise BadPromptError(f"Stability unable to create image using prompt {prompt}: {response.text}.")
 
         data = response.json()["artifacts"][0]
         return self._base64_to_image(data['base64'])
 
-    def _base64_to_image(self, base64_string: str) -> PIL.Image.Image:
+    @staticmethod
+    def _base64_to_image(base64_string: str) -> PIL.Image.Image:
         # Remove the "data:image/jpeg;base64," prefix if present
         if base64_string.startswith("data:image"):
             _, base64_string = base64_string.split(",", 1)
         image_bytes = base64.b64decode(base64_string)
         image_buffer = io.BufferedReader(io.BytesIO(image_bytes))
-        image = PIL.Image.open(image_buffer)
-        return image
+        return PIL.Image.open(image_buffer)
 
 
 def load_main() -> ArticleImageGenerator:
-    return ArticleImageGenerator(STABILITY_API_KEY)
+    return ArticleImageGenerator(stability_api_key=STABILITY_API_KEY)

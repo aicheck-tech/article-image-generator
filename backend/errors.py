@@ -1,0 +1,2 @@
+class BadPromptError(Exception):
+    pass

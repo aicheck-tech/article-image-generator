@@ -1,5 +1,6 @@
 # Stefik - FastAPI
 fastapi==0.95.1
+requests
 uvicorn==0.22.0
 
 # Stefik - TextProcessing
