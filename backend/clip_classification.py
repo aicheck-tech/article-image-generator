@@ -74,7 +74,6 @@ class DeepConcatenationModel(nn.Module):
 
 
 def load_classifiear() -> ClipClassification:
-        classifier = ClipClassification()
-        classifier.eval()
-        # classifier.load_state_dict(torch.load("model.pth"))
-        return classifier
+    classifier = ClipClassification()
+    classifier.eval()  # freeze weights
+    return classifier
