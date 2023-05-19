@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 import os
 import io
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Union
 import base64
 import json
 
@@ -23,46 +23,54 @@ load_dotenv()
 STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
 
 
-class Main:
-    def __init__(self, STABILITY_API_KEY) -> None:
+class ArticleImageGenerator:
+    def __init__(self, stability_api_key: str = STABILITY_API_KEY):
         self.classifier = clip_classification.load_classifiear()
         self.text_processor = text_processing()
-        self.stability_api_key = STABILITY_API_KEY
+        self.stability_api_key = stability_api_key
 
-    def main(self, text: str, tags: List[str]) -> Dict[PIL.Image.Image, Tuple[float, float]]:
+    def main(self, text: str, tags: List[str]) -> Dict[str, Union[float, PIL.Image.Image]]:
+        """
+
+        Args:
+            text: article content or summary or heading
+            tags: manually and automatically annotated tags describing content of article
+
+        Returns: dict containing image bytes and confidence score <0, 1>
+
+        """
         summmarized_text = self.text_processor.summarize_text(text)
-        prompt = self.text_processor.text_to_tagged_prompt(
-            summmarized_text, tags)['prompt']
-        image = self._request_on_stability_api(prompt)
+        prompt: str = self.text_processor.text_to_tagged_prompt(summmarized_text, tags)['prompt']
+        image: PIL.Image.Image = self._prompt_to_image_with_stability_api(prompt)
         tensor_similarity = self._classify(image, summmarized_text)
-        similarity = tensor_similarity.cpu().numpy()
-        similarity *= 100
-        similarity = (similarity[0][0], similarity[0][1])
-        self._log_output(text, image, similarity, prompt)
-        return {"image": image, "similarity": similarity}
+        similarity_vector = tensor_similarity.cpu().numpy()  # [[similarity, 1-similarity]]
+        confidence = similarity_vector[0][0]
+        self._save_output(text, image, confidence, prompt)
+        return {"image_bytes": image.tobytes(), "confidence": confidence}
 
-    def _log_output(self,
-                    summirized_text: str,
-                    image: PIL.Image.Image,
-                    similarity: Tuple[float, float],
-                    prompt: str) -> None:
+    def _save_output(self,
+                     summarized_text: str,
+                     image: PIL.Image.Image,
+                     similarity: Tuple[float, float],
+                     prompt: str) -> None:
         json_data = {
-            "text": summirized_text,
+            "text": summarized_text,
             "prompt": prompt,
             "similarity": f"{similarity[0]}% similarity, {similarity[1]}% dissimilarity",
             "image": base64.b64encode(image.tobytes()).decode('utf-8')
         }
-        json_output_path = self._save_non_duplicate_file_as_number(
-            settings.BACKEND_LOG_PATH, 'json')
-        with open(json_output_path, 'w') as f:
-            json.dump(json_data, f, indent=4)
+        json_output_path = self._generate_free_file_name()
+        with json_output_path.open("w") as handler:
+            json.dump(json_data, handler, indent=4, ensure_ascii=False)
 
-    def _save_non_duplicate_file_as_number(self, path: str, file_type: str):
+    def _generate_free_file_name(self):
+        # FIXME convert to db storage instead of file system
         counter = 0
-        while path.exists():
-            path = settings.BACKEND_LOG_PATH / f'{counter}.{file_type}'
+        save_path = None
+        while save_path is None or save_path.exists():
+            save_path = settings.BACKEND_LOG_PATH / f'{counter}.json'
             counter += 1
-        return path
+        return save_path
 
     def _classify(self, img, text):
         """
@@ -74,11 +82,11 @@ class Main:
             output = self.classifier(text_tensor, img_tensor)
         return torch.softmax(output, dim=1)
 
-    def _request_on_stability_api(self,
-                                  prompt: str,
-                                  height: int = 512,
-                                  width: int = 512,
-                                  steps: int = 20) -> PIL.Image.Image:
+    def _prompt_to_image_with_stability_api(self,
+                                            prompt: str,
+                                            height: int = 512,
+                                            width: int = 512,
+                                            steps: int = 20) -> PIL.Image.Image:
 
         response = requests.post(
             settings.STABILITY_GENERATION_URL,
@@ -117,5 +125,5 @@ class Main:
         return image
 
 
-def load_main() -> Main:
-    return Main(STABILITY_API_KEY)
+def load_main() -> ArticleImageGenerator:
+    return ArticleImageGenerator(STABILITY_API_KEY)
