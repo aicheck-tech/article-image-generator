@@ -1,5 +1,6 @@
 # Stefik - FastAPI
 fastapi==0.95.1
+pydantic
 requests
 uvicorn==0.22.0
 

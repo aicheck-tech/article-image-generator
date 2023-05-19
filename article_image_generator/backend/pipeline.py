@@ -2,26 +2,18 @@ import base64
 import json
 import io
 import os
-import sys
-from pathlib import Path
 from typing import List, Dict, Tuple, Union
 
 import PIL
 import requests
 import torch
-from dotenv import load_dotenv
 
-import clip_classification
-import settings
-from backend.errors import BadPromptError
-from text_processing import text_processing
-
-
-parent_folder = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(parent_folder))
+from article_image_generator.backend import clip_classification
+from article_image_generator.settings import BACKEND_LOG_PATH, STABILITY_GENERATION_URL
+from article_image_generator.backend.errors import BadPromptError
+from article_image_generator.backend.text_processing import text_processing
 
 
-load_dotenv()
 STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
 
 
@@ -42,7 +34,7 @@ class ArticleImageGenerator:
 
         """
         summmarized_text = self.text_processor.summarize_text(text)
-        prompt: str = self.text_processor.text_to_tagged_prompt(summmarized_text, tags)['prompt']
+        prompt: str = self.text_processor.text_to_tagged_prompt(summmarized_text, tags)
         image: PIL.Image.Image = self._prompt_to_image_with_stability_api(prompt)
         tensor_similarity = self._classify(image, summmarized_text)
         similarity_vector = tensor_similarity.cpu().numpy()  # [[similarity, 1-similarity]]
@@ -70,7 +62,7 @@ class ArticleImageGenerator:
         counter = 0
         save_path = None
         while save_path is None or save_path.exists():
-            save_path = settings.BACKEND_LOG_PATH / f'{counter}.json'
+            save_path = BACKEND_LOG_PATH / f'{counter}.json'
             counter += 1
         return save_path
 
@@ -90,7 +82,7 @@ class ArticleImageGenerator:
                                             width: int = 512,
                                             steps: int = 20) -> PIL.Image.Image:
         response = requests.post(
-            settings.STABILITY_GENERATION_URL,
+            STABILITY_GENERATION_URL,
             headers={
                 "Content-Type": "application/json",
                 "Accept": "application/json",
@@ -126,5 +118,5 @@ class ArticleImageGenerator:
         return PIL.Image.open(image_buffer)
 
 
-def load_main() -> ArticleImageGenerator:
+def load_pipeline() -> ArticleImageGenerator:
     return ArticleImageGenerator(stability_api_key=STABILITY_API_KEY)
