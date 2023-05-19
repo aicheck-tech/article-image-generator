@@ -25,9 +25,8 @@ def merge_json_files():
                 print(f"Error: Failed to parse JSON in file {file_path}")
 
     # Create a dictionary with keys starting from 0
-    result_dict = {i: value for i, value in enumerate(json_data)}
     with open(OUTPUT_PATH, 'w', encoding="utf-8") as file:
-        json.dump(result_dict, file, indent=4)
+        file.write(json.dumps(json_data, indent=4))
 
 
 # Print the resulting dictionary

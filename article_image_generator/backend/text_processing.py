@@ -1,20 +1,19 @@
-import os
 import re
 from typing import List, Dict
 import logging
 
 import openai
-from dotenv import load_dotenv
 import tiktoken
 
-from settings import *
-
-load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_API_ENGINE = os.getenv("OPENAI_API_ENGINE")
-OPENAI_CUSTOM_DOMAIN = os.getenv("OPENAI_CUSTOM_DOMAIN")
+from article_image_generator.service import service
+from article_image_generator.settings import (
+    OPENAI_API_VERSION, OPENAI_ENCODING_NAME, OPENAI_SUMMARIZE_SYSTEM_TEXT,
+    OPENAI_SUMMARIZATION_MAX_TOKENS, OPENAI_PROMPT_SYSTEM_TEXT, OPENAI_TEXT_TO_PROMPT_MAX_TOKENS,
+    OPENAI_SUMMARIZE_TEXTS_LONGER_THAN_N_TOKENS, OPENAI_API_KEY, OPENAI_API_ENGINE, OPENAI_CUSTOM_DOMAIN
+)
 
 logger = logging.getLogger(__name__)
+
 
 class TextProcessing:
     def __init__(self,
@@ -58,7 +57,7 @@ class TextProcessing:
         logger.debug(prompt)
         return prompt
 
-    def count_tokens(self, text:str) -> int:
+    def count_tokens(self, text: str) -> int:
         encoding = tiktoken.get_encoding(OPENAI_ENCODING_NAME)
         num_tokens = len(encoding.encode(text))
         return num_tokens
@@ -87,18 +86,17 @@ class TextProcessing:
             }
         ])
 
-        MAX_TOKENS = self.count_tokens(prompt) + OPENAI_SUMMARIZATION_MAX_TOKENS
-        logger.info("Summarization max tokens: %s", MAX_TOKENS)
+        max_tokens = self.count_tokens(prompt) + OPENAI_SUMMARIZATION_MAX_TOKENS
+        logger.info("Summarization max tokens: %s", max_tokens)
         response = openai.Completion.create(
             engine=self.OPENAI_API_ENGINE,
             prompt=prompt,
             temperature=0.7,
-            max_tokens=MAX_TOKENS,
+            max_tokens=max_tokens,
             top_p=0.95,
             frequency_penalty=0.3,
             presence_penalty=0,
             stop=["<|im_end|>"])
-        
 
         logger.debug(response)
         logger.info("Summarized text %s.", response["choices"][0]["text"])
@@ -111,8 +109,7 @@ class TextProcessing:
             text: Text from article
             tags: List of tags to create more fitting prompt
 
-        Returns:
-            str: generated prompt
+        Returns: generated prompt
         """
         logger.info("Generating prompt from text %s.", text.replace("\n", "\n"))
 
@@ -121,12 +118,12 @@ class TextProcessing:
             {
                 "role": "system",
                 "content": (
-                    OPENAI_PROMPT_SYSTEM_TEXT +
-                    (
-                    f"The design should be {', '.join(tags)}\n\n"
-                    "Annotate it as:\n"
-                    "'prompt': <the prompt>"
-                    )
+                        OPENAI_PROMPT_SYSTEM_TEXT +
+                        (
+                            f"The design should be {', '.join(tags)}\n\n"
+                            "Annotate it as:\n"
+                            "'prompt': <the prompt>"
+                        )
                 )
             },
             {
@@ -135,26 +132,25 @@ class TextProcessing:
             }
         ])
 
-        MAX_TOKENS = self.count_tokens(prompt) + OPENAI_TEXT_TO_PROMPT_MAX_TOKENS
-        logger.info("Text to prompt max tokens: %s", MAX_TOKENS)
+        max_tokens = self.count_tokens(prompt) + OPENAI_TEXT_TO_PROMPT_MAX_TOKENS
+        logger.info("Text to prompt max tokens: %s", max_tokens)
         response = openai.Completion.create(
             engine=self.OPENAI_API_ENGINE,
             prompt=prompt,
             temperature=0,
-            max_tokens=MAX_TOKENS,
+            max_tokens=max_tokens,
             top_p=0.95,
             frequency_penalty=0,
             presence_penalty=0,
             stop=["<|im_end|>"]
-            )
+        )
 
         logger.debug(response)
         answer = response["choices"][0]["text"]
-        
-        result = re.search(
-            r"^'prompt': (.*)$", answer)
-        
-        return {"prompt": result.group(1)}
+
+        result = re.search(r"^'prompt': (.*)$", answer)
+
+        return result.group(1)
 
     def text_to_tagged_prompt(self, text, tags: List[str]) -> str:
         """
@@ -171,14 +167,15 @@ class TextProcessing:
 
         logger.info("Generating prompt from text and tags")
 
-        if (self.count_tokens(text) > OPENAI_SUMMARIZE_TEXTS_LONGER_THAN_N_TOKENS):
+        if self.count_tokens(text) > OPENAI_SUMMARIZE_TEXTS_LONGER_THAN_N_TOKENS:
             text = self.summarize_text(text)
         text_to_prompt = self.text_to_prompt(text, tags)
-        
+
         logging.info(text_to_prompt)
         return text_to_prompt
 
 
+@service
 def text_processing() -> TextProcessing:
     return TextProcessing(
         OPENAI_API_KEY,

@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "apify": "^3.1.4",
+    "crawlee": "^3.3.2"
+  },
+  "type": "module"
+}

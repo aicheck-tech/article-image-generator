@@ -1,18 +1,18 @@
 import argparse
-from PIL import Image
 import io
 import logging
+from PIL import Image
 
+import datasets
 import requests
 import torch
 from torch.utils.data import DataLoader
 
-import anlys
-from clip_classification import ClipClassification
-import train_settings
+from article_image_generator.backend.clip_classification import ClipClassification
+from article_image_generator.settings import BATCH_SIZE, DATASETS
 
 
-logging.getLogger().setLevel(logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def calculate_acc_loss_avg(corrects: int,
@@ -57,11 +57,10 @@ def train(train_loader, loss_fn, optimizer, model) -> None:
         optimizer.step()
         if batch % 100 == 0:
             progress = batch * len(labels)
-            log = f"\tloss: {loss:>8f}, [{progress:>5f}/{data_size:>5f}]\n"
-            logging.info(log)
+            logger.info(f"\tloss: {loss:>8f}, [{progress:>5f}/{data_size:>5f}]")
 
 
-def test(model, data_loader, loss_fn) -> None:
+def evaluate_model(model, data_loader, loss_fn):
     data_size = len(data_loader.dataset)
     num_batches = len(data_loader)
     model.eval()
@@ -87,15 +86,17 @@ def test(model, data_loader, loss_fn) -> None:
     loss2 /= num_batches
     correct /= data_size
     correct2 /= data_size
-    log = f"\nResults: \n\tTest Error: {(100*correct):>0.1f}%, Avg loss: {loss:>8f}\n" \
-          f"\tMy Accuracy: {(100*correct2):>0.1f}%, Avg loss: {loss2:>8f}\n"
-    logging.info(log)
+    # FIXME rename loss2
+    logger.info(
+        f"Results: TestError={(100 * correct):>0.1f}%, AvgLoss={loss:>8f}"
+        f"MyAccuracy={(100 * correct2):>0.1f}%, AvgLoss2={loss2:>8f}"
+    )
     return correct, loss, correct2, loss2
 
 
 def load_dataset(dataset: str):
-    """ Loads the dataset from the json file,
-        and splits it into train and test data"""
+    """ Loads the dataset from the json file, and splits it into train and test data"""
+
     def collate_fn(data: list):
         titles = [doc['title'] for doc in data]
         texts = [doc['text'] for doc in data]
@@ -104,30 +105,26 @@ def load_dataset(dataset: str):
         texts = [f"{title}\n{text}" for title, text in zip(titles, texts)]
 
         image_list = []
-        for img in image_urls:
+        for img_url in image_urls:
             try:
-                response = requests.get(img)
+                response = requests.get(img_url)
                 response.raise_for_status()
                 image = Image.open(io.BytesIO(response.content))
                 image_list.append(image)
-            except requests.exceptions.RequestException as e:
-                logging.info(f"Error occurred while downloading image: {img}")
-                logging.info(e)
-                pass
+            except requests.exceptions.RequestException:
+                logger.exception(f"Downloading image failed for url {img_url}.")
 
         batch_text = [model.tokenize(text) for text in texts]
         batch_images = [model.convert_img(img) for img in image_list]
         batch_labels = torch.tensor(labels)
         return torch.concat(batch_text), torch.concat(batch_images), batch_labels
 
-    json_data = anlys.load_json_to_list(train_settings.DATASETS[dataset])
-
-    train_data, test_data = anlys.split_data(
-        json_data, train_settings.TRAIN_TEST_SPLIT_RATIO)
+    train_data = datasets.load_dataset(DATASETS[dataset], split="train")
+    test_data = datasets.load_dataset(DATASETS[dataset], split="test")
 
     train_dataloader = DataLoader(
         dataset=train_data,
-        batch_size=train_settings.BATCH_SIZE,
+        batch_size=BATCH_SIZE,
         shuffle=True,
         collate_fn=collate_fn,
     )
@@ -152,15 +149,15 @@ def start_train(model,
     train(train_dataloader, loss_fn, optimizer, model)
     torch.save(model.state_dict(), output_path)
 
-    test(model, test_dataloader, loss_fn)
-    test(model, train_dataloader, loss_fn)
+    evaluate_model(model, test_dataloader, loss_fn)
+    evaluate_model(model, train_dataloader, loss_fn)
 
 
 def start_test(model, train_dataloader: DataLoader, test_dataloader: DataLoader) -> None:
     loss_fn = torch.nn.CrossEntropyLoss()
 
-    test(model, test_dataloader, loss_fn)
-    test(model, train_dataloader, loss_fn)
+    evaluate_model(model, test_dataloader, loss_fn)
+    evaluate_model(model, train_dataloader, loss_fn)
 
 
 if __name__ == "__main__":
@@ -179,13 +176,13 @@ if __name__ == "__main__":
     model = ClipClassification()
     train_dataloader, test_dataloader = load_dataset("bbc")
     output = "model.pth"
-    learning_rate = 1e-3
+    learning_rate = 1e-4
     args = get_args()
     if args.path_to_model:
         try:
             model = model.load_state_dict(torch.load(args.path_to_model))
         except FileNotFoundError:
-            logging.info("Model not found")
+            logger.info("Model not found")
     if args.dataset:
         train_dataloader, test_dataloader = load_dataset(args.dataset)
     if args.output_path:

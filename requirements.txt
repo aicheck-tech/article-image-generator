@@ -1,5 +1,7 @@
 # Stefik - FastAPI
 fastapi==0.95.1
+pydantic
+requests
 uvicorn==0.22.0
 
 # Stefik - TextProcessing
@@ -11,14 +13,17 @@ tiktoken
 torch
 torchvision
 
-# Dzeniks - stable-diffusion
+# transformers
+datasets
+
+# stable-diffusion
 diffusers
 transformers
 accelerate
 scipy
 safetensors
 
-# Dzeniks - CLIP-OpenAI
+# CLIP-OpenAI
 ftfy
 regex
 tqdm
