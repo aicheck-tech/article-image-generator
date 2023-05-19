@@ -72,7 +72,7 @@ class DeepConcatenationModel(nn.Module):
         img_vector = self.img_layer(img)
         return torch.cat([text_vector, img_vector], dim=1)
 
-
+@service
 def load_classifiear() -> ClipClassification:
     classifier = ClipClassification()
     classifier.eval()  # freeze weights
