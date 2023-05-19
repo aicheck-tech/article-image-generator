@@ -1,11 +1,19 @@
 :root {
+    --color-primary: 43, 43, 43;
+    --color-secondary: 36, 36, 36;
+    --color-tertiary: 65, 65, 65;
+    --color-text: 255, 255, 255;
+    --color-highlight: 255, 255, 255;
+    
+    --border-radius: 10px;
+
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-primary));
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -36,14 +44,13 @@ h1 {
   line-height: 1.1;
 }
 
-.card {
-  padding: 2em;
+h1, h2 {
+    margin: 0;
+    font-weight: 600;
 }
 
 #app {
-  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -77,4 +84,19 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
 }

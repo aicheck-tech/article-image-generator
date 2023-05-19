@@ -10,9 +10,10 @@ from fastapi.staticfiles import StaticFiles
 from article_image_generator.backend.text_processing import text_processing
 from article_image_generator.settings import *
 
+PATH = Path(__file__).parent/"public"
 
 app = FastAPI()
-app.mount("/assets", StaticFiles(directory="public/assets"), name="static")
+app.mount("/assets", StaticFiles(directory=PATH/"assets"), name="static")
 
 
 class TextToPromptRequest(BaseModel):
@@ -22,7 +23,7 @@ class TextToPromptRequest(BaseModel):
 
 @app.get("/", response_class=FileResponse)
 def main():
-    return "public/index.html"
+    return PATH/"index.html"
 
 
 @app.post("/backend/text-to-prompts", response_class=JSONResponse)
@@ -44,4 +45,4 @@ if __name__ == "__main__":
         filename="fastapi-dev.log",
         filemode="w"
     )
-    uvicorn.run("main:app", port=8001, workers=1)
+    uvicorn.run("article_image_generator.main:app", port=8001, workers=1)
