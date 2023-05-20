@@ -1,6 +1,8 @@
 # Stefik_O ignores
 !lib
 !public
+!tsconfig.json
+!tsconfig.node.json
 
 # Logs
 logs

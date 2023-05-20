@@ -1,11 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Flow+Circular&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400&display=swap');
+
 :root {
+    --color-primary: 43, 43, 43;
+    --color-secondary: 36, 36, 36;
+    --color-tertiary: 65, 65, 65;
+    --color-text: 255, 255, 255;
+    --color-highlight: 91, 144, 241;
+    --color-button: 26, 26, 26;
+    
+    --border-radius: 5px;
+
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-primary));
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -16,11 +28,11 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: rgba(var(--color-highlight));
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: rgba(var(--color-highlight), 0.75);
 }
 
 body {
@@ -36,14 +48,13 @@ h1 {
   line-height: 1.1;
 }
 
-.card {
-  padding: 2em;
+h1, h2 {
+    margin: 0;
+    font-weight: 600;
 }
 
 #app {
-  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -54,27 +65,37 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: rgb(var(--color-button));
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: rgb(var(--color-highlight));
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 4px auto rgba(var(--color-highlight), 0.5);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--color-text), 0.2);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--color-text), 0.25);
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(var(--color-secondary), 1);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: transparent;
 }
