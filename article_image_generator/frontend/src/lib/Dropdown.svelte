@@ -1,20 +1,18 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    export let default_item: string;
+    export let default_item: number;
     export let tags: string[];
     export let border_radius: string = "var(--border-radius)";
 
-    import arrow_forward from "../assets/icons/arrow_forward_fill.png";
-    import design_services from "../assets/icons/design_services_fill.png";
+    import arrow_forward from "@assets/icons/arrow_forward_fill.png";
+    import design_services from "@assets/icons/design_services_fill.png";
     
     let current_tag = tags[default_item];
     let dropdown;
 
     onMount(() => {
         dropdown.setAttribute("tabindex", "0");
-        const dropdown_content:HTMLDivElement = dropdown.querySelector(".dropdown-content");
-
     });
 </script>
 
@@ -59,18 +57,18 @@
         padding-top: 0.75em;
         padding-bottom: 0.75em;
 
-        border: 2px solid rgb(var(--color-tertiary));
+        border: 1px solid rgb(var(--color-tertiary));
     }
 
     .dropdown-content {
         display: none;
         position: absolute;
         left: 100%;
-        top: -100%;
+        top: 0%;
 
         padding: 0px;
 
-        width: 75%;
+        width: fit-content;
         min-width: 160px;
         box-sizing: border-box;
 

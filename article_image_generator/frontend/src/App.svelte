@@ -1,22 +1,17 @@
 <script lang="ts">
     import { onMount } from "svelte";
-
-    import Dropdown from "./lib/Dropdown.svelte";
-
-    import favicon from "./assets/favicon.ico";
-    import OutputImageSection from "./lib/OutputImageSection.svelte";
-
-    var link = document.querySelector("link[rel~='icon']");
-    if (!link) {
-        link = document.createElement("link");
-        link.rel = "icon";
-        document.head.appendChild(link);
-    }
-    link.href = `${favicon}`;
+    
+    import favicon from "@assets/favicon.ico";
+    import Dropdown from "@lib/Dropdown.svelte";
+    import OutputImageSection from "@lib/OutputImageSection.svelte";
 
     const tags = ["realistic", "cinematic", "cartoon", "sketch"];
     let default_item = 0;
 
+    onMount(() => {
+        let link = document.getElementById("favicon") as HTMLLinkElement;
+        link.href = favicon;
+    });
 </script>
 
 <main>
@@ -37,10 +32,10 @@
     <output class="output-panel">
         <OutputImageSection></OutputImageSection>
         <OutputImageSection image="https://picsum.photos/512/512">
-            <span slot="prompt">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.</span>
+            <span slot="article">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.</span>
         </OutputImageSection>
         <OutputImageSection image="https://picsum.photos/512/512">
-            <span slot="prompt">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.</span>
+            <span slot="article">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.</span>
         </OutputImageSection>
     </output>
 </main>
@@ -114,19 +109,23 @@
 
         height: 50%;
         min-height: 12rem;
-        max-height: 69vh;
+        max-height: 65vh;
 
         margin: 0.5em;
         padding: 0.5em;
 
         background: rgb(var(--color-secondary));
 
-        border: 2px solid rgb(var(--color-tertiary));
+        border: 1px solid rgb(var(--color-tertiary));
         border-radius: var(--border-radius);
     }
 
     .article-textarea::placeholder {
         color: rgba(var(--color-text), 0.5);
+
+        font-family: 'Roboto Mono', monospace;
+        font-weight: 300;
+        font-size: 0.9em;
     }
 
     .article-textarea:focus {
