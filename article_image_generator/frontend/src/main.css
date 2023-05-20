@@ -83,12 +83,16 @@ button:focus-visible {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(var(--color-highlight), 0.25);
+  background-color: rgba(var(--color-text), 0.2);
   border-radius: 8px;
 }
 
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--color-text), 0.25);
+}
+
 ::-webkit-scrollbar-track {
-  background-color: rgba(var(--color-highlight), 0.05);
+  background-color: rgba(var(--color-secondary), 1);
   border-radius: 8px;
 }
 
