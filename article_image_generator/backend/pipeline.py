@@ -48,14 +48,16 @@ class ArticleImageGenerator:
                      image: PIL.Image.Image,
                      similarity: Tuple[float, float],
                      prompt: str) -> None:
+        json_output_path = self._generate_free_file_name()
+        img_output_path = json_output_path.with_suffix(".jpg") 
         json_data = {
             "text": summarized_text,
             "prompt": prompt,
-            "similarity": f"{similarity[0]}% similarity, {similarity[1]}% dissimilarity",
-            "image": base64.b64encode(image.tobytes()).decode('utf-8')
+            "confidence": f"{similarity}",
+            "image": f"{img_output_path}"
         }
-        json_output_path = self._generate_free_file_name()
-        with json_output_path.open("w") as handler:
+        image.save(img_output_path)
+        with json_output_path.open("w", encoding="utf-8") as handler:
             json.dump(json_data, handler, indent=4, ensure_ascii=False)
 
     def _generate_free_file_name(self):
@@ -123,6 +125,4 @@ def load_pipeline() -> ArticleImageGenerator:
     return ArticleImageGenerator(stability_api_key=STABILITY_API_KEY)
 
 
-if __name__ == "__main__":
-    ok = load_pipeline()
-    print(ok.main("test", ["test"]))
+
