@@ -12,6 +12,7 @@ from article_image_generator.backend import clip_classification
 from article_image_generator.settings import BACKEND_LOG_PATH, STABILITY_GENERATION_URL
 from article_image_generator.backend.errors import BadPromptError
 from article_image_generator.backend.text_processing import text_processing
+from article_image_generator.service import service
 
 
 STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
@@ -120,3 +121,8 @@ class ArticleImageGenerator:
 @service
 def load_pipeline() -> ArticleImageGenerator:
     return ArticleImageGenerator(stability_api_key=STABILITY_API_KEY)
+
+
+if __name__ == "__main__":
+    ok = load_pipeline()
+    print(ok.main("test", ["test"]))
