@@ -25,7 +25,13 @@
     <div class="dropdown-content">
         {#each items as item}
             <label class="tag">
-                <input tabindex="0" type="radio" name={name} value={item} bind:group={current_item} />
+                <input 
+                    tabindex="0" 
+                    type="radio" 
+                    name={name} 
+                    value={item} 
+                    bind:group={current_item} 
+                />
                 {item}
             </label>
         {/each}

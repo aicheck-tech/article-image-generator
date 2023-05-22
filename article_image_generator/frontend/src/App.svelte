@@ -6,15 +6,10 @@
     import OutputImageSection from "@lib/OutputImageSection.svelte";
 
     const tags = ["realistic", "cinematic", "cartoon", "sketch"];
-    let image_look;
+
+    let image_look: string;
     let textarea_value: string = "";
-    let outputs: Array<{image: string, article: string, prompt: string}> = [
-        {
-            image: "https://picsum.photos/512/512",
-            article: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.",
-            prompt: "Lorem ipsum in many words"
-        }
-    ];
+    let outputs: Array<{image: string, article: string, prompt: string}> = [];
 
     async function textToImage(text:string): Promise<{ image_base64: string; prompt: string; confidence: number; }> {
         const obj = { 
