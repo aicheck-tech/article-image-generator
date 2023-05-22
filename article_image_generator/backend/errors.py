@@ -1,5 +1,6 @@
 class BadPromptError(Exception):
     pass
 
-class NotFoundKeyword(Exception):
+
+class NotFoundAnyTerm(Exception):
     pass

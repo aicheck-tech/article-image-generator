@@ -35,14 +35,15 @@ OPENAI_PROMPT_SYSTEM_TEXT = (
 )
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_API_ENGINE = os.getenv("OPENAI_API_ENGINE")
+OPENAI_API_ENGINE_COMPLETION = os.getenv("OPENAI_API_ENGINE")
+OPENAI_API_ENGINE_EMBEDDING = "text-search-ada-doc-001"
 OPENAI_CUSTOM_DOMAIN = os.getenv("OPENAI_CUSTOM_DOMAIN")
 
 # Stable Diffusion
 STABLE_DIFFUSION_MODEL_PATH = "stabilityai/stable-diffusion-2-1"
 
 # DreamStudio API - Stable Diffusion
-STABILITY_ENGINE = "stable-diffusion-512-v2-1"
+STABILITY_ENGINE = "stable-diffusion-xl-beta-v2-2-2"
 STABILITY_GENERATION_URL = f"https://api.stability.ai/v1/generation/{STABILITY_ENGINE}/text-to-image"
 
 # Train settings
