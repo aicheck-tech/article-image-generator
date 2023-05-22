@@ -92,7 +92,7 @@ class TextProcessing:
                     lst[i] = (lst[i][0], lst[i][1]+lst[j][1])
         return lst
 
-    def extract_keywords(self, text: str) -> List[str]:
+    def extract_keywords(self, text: str) -> List[Tuple[str, int]]:
         """Extract keywords from text"""
         tokens_from_text = nltk.tokenize.word_tokenize(text)
         positional_tags = nltk.pos_tag(tokens_from_text)
