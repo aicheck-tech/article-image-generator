@@ -1,10 +1,15 @@
 import re
-from typing import List, Dict
 import logging
+import math
+from typing import List, Dict, Tuple
+from collections import Counter
 
+import nltk
 import openai
 import tiktoken
+from yake import KeywordExtractor
 
+from article_image_generator.backend.errors import NotFoundKeyword
 from article_image_generator.service import service
 from article_image_generator.settings import (
     OPENAI_API_VERSION, OPENAI_ENCODING_NAME, OPENAI_SUMMARIZE_SYSTEM_TEXT,
@@ -24,7 +29,8 @@ class TextProcessing:
         self.OPENAI_API_KEY = openai_api_key
         self.OPENAI_API_ENGINE = openai_api_engine
         self.OPENAI_CUSTOM_DOMAIN = openai_custom_domain
-
+        self.kw_extractor = KeywordExtractor()
+        self.WORD = re.compile(r'\w+')
         self._setup_openai()
 
     def _setup_openai(self):
@@ -61,6 +67,51 @@ class TextProcessing:
         encoding = tiktoken.get_encoding(OPENAI_ENCODING_NAME)
         num_tokens = len(encoding.encode(text))
         return num_tokens
+    
+    def get_cosine(self, vec1:Counter, vec2:Counter) -> float:
+        intersection = set(vec1.keys()) & set(vec2.keys())
+        numerator = sum(vec1[x] * vec2[x] for x in intersection)
+        sum1 = math.fsum(vec1[x]**2 for x in vec1)
+        sum2 = math.fsum(vec2[x]**2 for x in vec2)
+        denominator = math.sqrt(sum1) * math.sqrt(sum2)
+        return float(numerator) / denominator if denominator else 0.0
+    
+    def text_to_vector(self, text:str) -> Counter:
+        return Counter(self.WORD.findall(text.lower()))
+    
+    def get_text_similarity(self, a, b) -> float:
+        a = self.text_to_vector(a.strip())
+        b = self.text_to_vector(b.strip())
+        return self.get_cosine(a, b)
+    
+    def add_value_from_substring(self, lst: List[Tuple[str, int]]) -> List[Tuple[str, int]]:
+        """Add value from substring in list of tuple to bigger string in list of tuple."""
+        for i in range(len(lst)):
+            for j in range(len(lst)):
+                if i != j and lst[j][0] in lst[i][0] and (len(lst[i][0]) > len(lst[j][0])):
+                    lst[i] = (lst[i][0], lst[i][1]+lst[j][1])
+        return lst
+
+    def extract_keywords(self, text: str) -> List[str]:
+        """Extract keywords from text"""
+        tokens_from_text = nltk.tokenize.word_tokenize(text)
+        positional_tags = nltk.pos_tag(tokens_from_text)
+        nouns = [word for word, tag in positional_tags if tag.startswith('N')]
+        pronouns = [word for word, tag in positional_tags if tag == 'PRP']
+        positional_word = nouns + pronouns
+        # Extract Subjects
+        keywords = self.kw_extractor.extract_keywords(text)
+
+        if keywords == []:
+            raise NotFoundKeyword("Not found keyword in text")
+        ''' Calculate score for each title : tuple(title:str, score:float)
+            Add score for cosine similarity with text if keyword is in positional_word
+        ''' 
+        keywords = [(keyword[0], keyword[1]+self.get_text_similarity(text, keyword[0])) if keyword[0] in positional_word else keyword for keyword in keywords]
+        keywords = self.add_value_from_substring(keywords)
+        # Sort by score
+        keywords = sorted(keywords, key=lambda x: x[1], reverse=True)
+        return keywords
 
     def summarize_text(self, text: str) -> str:
         """Summarize text using OpenAI API.
