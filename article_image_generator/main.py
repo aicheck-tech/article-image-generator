@@ -1,5 +1,7 @@
 import logging
 from pydantic import BaseModel
+from typing import List, Literal, Dict, Union
+from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
@@ -7,18 +9,17 @@ from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from article_image_generator.backend.text_processing import text_processing
-from article_image_generator.settings import *
+from article_image_generator.backend.pipeline import load_pipeline
+from article_image_generator.settings import DEBUG, IMAGE_STYLES
 
 PATH = Path(__file__).parent/"public"
 
 app = FastAPI()
 app.mount("/assets", StaticFiles(directory=PATH/"assets"), name="static")
 
-
 class TextToPromptRequest(BaseModel):
     text_for_processing: str
-    tags: list[str]
+    image_look: Literal["realistic", "cinematic", "cartoon", "sketch"]
 
 
 @app.get("/", response_class=FileResponse)
@@ -26,15 +27,21 @@ def main():
     return PATH/"index.html"
 
 
-@app.post("/backend/text-to-prompts", response_class=JSONResponse)
-def text_to_prompt_response(
-                        text_and_tags: TextToPromptRequest
+@app.post("/backend/text-to-image", response_class=JSONResponse)
+def text_to_image_response(
+                        text_and_look: TextToPromptRequest
                         ) -> JSONResponse:
-    text_for_processing = text_and_tags.text_for_processing
-    tags = text_and_tags.tags
-    prompt = text_processing().text_to_tagged_prompt(text_for_processing, tags)
+    text_for_processing = text_and_look.text_for_processing
+    image_look = text_and_look.image_look
+        
+    article_image_generator = load_pipeline()
+    output: Dict[str, Union[bytes, float, str]] = article_image_generator.main(text_for_processing, IMAGE_STYLES[image_look])
 
-    return JSONResponse(status_code=200, content={"prompt": prompt})
+    return JSONResponse(status_code=200, content={
+        "prompt": output["prompt"],
+        "confidence": output["confidence"],
+        "image_bytes": output["image_bytes"]
+        })
 
 
 if __name__ == "__main__":
@@ -45,4 +52,5 @@ if __name__ == "__main__":
         filename="fastapi-dev.log",
         filemode="w"
     )
+    
     uvicorn.run("article_image_generator.main:app", port=8001, workers=1)

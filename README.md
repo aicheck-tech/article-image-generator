@@ -63,17 +63,10 @@ python main.py
 ```js
 const obj = { 
     text_for_processing: "Yellow submarine with a red hat",
-    tags: [
-        "realistic",
-        "8k",
-        "octane render",
-        "cinematic",
-        "trending on artstation",
-        "cinematic composition"
-    ]
+    image_look: "realistic"
 };
 
-const request = new Request("/backend/textToPrompt", {
+const request = new Request("/backend/text-to-image", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -90,20 +83,13 @@ fetch(request).then((data) => {
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{
   "text_for_processing": "Yellow submarine with a red hat",
-  "tags": [
-    "realistic",
-    "8k",
-    "octane render",
-    "cinematic",
-    "trending on artstation",
-    "cinematic composition"
-  ]
-}' http://127.0.0.1:8001/backend/text-to-prompts
+  "image_look": "realistic"
+}' http://127.0.0.1:8001/backend/text-to-image
 ```
 
 ### Powershell:
 ```powershell
-$uri = "http://127.0.0.1:8001/backend/text-to-prompts"
+$uri = "http://127.0.0.1:8001/backend/text-to-image"
 
 $headers = @{
     "Content-Type" = "application/json"
@@ -111,14 +97,7 @@ $headers = @{
 
 $body = @{
     "text_for_processing" = "Yellow submarine with a red hat"
-    "tags" = @(
-        "realistic",
-        "8k",
-        "octane render",
-        "cinematic",
-        "trending on artstation",
-        "cinematic composition"
-    )
+    "image_look" = "realistic"
 }
 
 $response = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -Body ($body | ConvertTo-Json)
