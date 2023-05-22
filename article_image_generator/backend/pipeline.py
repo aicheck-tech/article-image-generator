@@ -12,6 +12,7 @@ from article_image_generator.backend import clip_classification
 from article_image_generator.settings import BACKEND_LOG_PATH, STABILITY_GENERATION_URL
 from article_image_generator.backend.errors import BadPromptError
 from article_image_generator.backend.text_processing import text_processing
+from article_image_generator.service import service
 
 
 STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
@@ -40,7 +41,7 @@ class ArticleImageGenerator:
         similarity_vector = tensor_similarity.cpu().numpy()  # [[similarity, 1-similarity]]
         confidence = similarity_vector[0][0]
         self._save_output(text, image, confidence, prompt)
-        return {"image_bytes": image.tobytes(), "confidence": confidence}
+        return {"image_bytes": image.tobytes(), "confidence": confidence, "prompt": prompt}
 
     def _save_output(self,
                      summarized_text: str,

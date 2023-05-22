@@ -8,6 +8,20 @@
     const tags = ["realistic", "cinematic", "cartoon", "sketch"];
     let default_item = 0;
 
+    let outputs: Array<{image: string, article: string, prompt: string}> = [
+        {
+            image: "https://picsum.photos/512/512",
+            article: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.",
+            prompt: "Lorem ipsum in many words"
+        }
+    ];
+
+    function textToImage(text:string): string {
+        
+
+        return "";
+    }
+
     onMount(() => {
         let link = document.getElementById("favicon") as HTMLLinkElement;
         link.href = favicon;
@@ -24,19 +38,22 @@
         <textarea class="article-textarea group" placeholder="Insert you article here..." />
         
         <section class="group input-panel-settings">
-            <Dropdown border_radius="var(--border-radius) var(--border-radius) 0 0" default_item={default_item} tags={tags} />
+            <Dropdown border_radius={["top-left", "top-right"]} default_item={default_item} tags={tags} />
             <button style="border-radius: 0 0 var(--border-radius) var(--border-radius)">Imagine</button>
         </section>
     </section>
 
     <output class="output-panel">
-        <OutputImageSection></OutputImageSection>
-        <OutputImageSection image="https://picsum.photos/512/512">
-            <span slot="article">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.</span>
-        </OutputImageSection>
-        <OutputImageSection image="https://picsum.photos/512/512">
-            <span slot="article">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.</span>
-        </OutputImageSection>
+        {#each outputs.slice().reverse() as output }
+            {#if output.image != undefined}
+                <OutputImageSection image={output.image}>
+                    <span slot="article">{output.article}</span>                
+                    <span slot="prompt">{output.prompt}</span>
+                </OutputImageSection>
+            {:else}
+                <OutputImageSection image={output.image} />
+            {/if}
+        {/each}
     </output>
 </main>
 

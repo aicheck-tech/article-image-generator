@@ -52,3 +52,35 @@ BATCH_SIZE = 1
 DATASETS = {
     "bbc": "Dzeniks/BBC-article"
 }
+
+IMAGE_STYLES = {
+    "realistic": [
+        "realistic",
+        "8k",
+        "octane render",
+        "cinematic",
+        "trending on artstation",
+        "cinematic composition"
+    ],
+    "cinematic": [
+        "cinematic",
+        "cinematic composition",
+        "ray tracing",
+        "log3",
+        "8k"
+    ],
+    "cartoon": [
+        "cartoon",
+        "hand drawn",
+        "full color",
+        "anime key visual",
+        "trending on artstation",
+    ],
+    "sketch": [
+        "high quality of sketching",
+        "ultra - detailed technical precision",
+        "monumentally art composition",
+        "octane render",
+        "grey paper sketch ink style"
+    ]
+}

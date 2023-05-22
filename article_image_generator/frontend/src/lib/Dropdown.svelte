@@ -3,20 +3,20 @@
 
     export let default_item: number;
     export let tags: string[];
-    export let border_radius: string = "var(--border-radius)";
+    export let border_radius: Array<"top-left" | "top-right" | "bottom-left" | "bottom-right"> | ["all"];
 
     import arrow_forward from "@assets/icons/arrow_forward_fill.png";
     import design_services from "@assets/icons/design_services_fill.png";
     
     let current_tag = tags[default_item];
-    let dropdown;
+    let dropdown: HTMLDivElement = null;
 
     onMount(() => {
         dropdown.setAttribute("tabindex", "0");
     });
 </script>
 
-<div class="dropdown" bind:this={dropdown} style="border-radius: {border_radius};">
+<div class="dropdown border-radius-{border_radius.join(" border-radius-")}" bind:this={dropdown}>
     <div class="group">
         <img src={design_services} alt="design_services" />
         <span>Look: {current_tag}</span>
@@ -126,5 +126,25 @@
         100% {
             transform: scaleX(1);
         }
+    }
+
+    .border-radius-top-left {
+        border-top-left-radius: var(--border-radius);
+    }
+
+    .border-radius-top-right {
+        border-top-right-radius: var(--border-radius);
+    }
+
+    .border-radius-bottom-left {
+        border-bottom-left-radius: var(--border-radius);
+    }
+
+    .border-radius-bottom-right {
+        border-bottom-right-radius: var(--border-radius);
+    }
+
+    .border-radius-all {
+        border-radius: var(--border-radius);
     }
 </style>

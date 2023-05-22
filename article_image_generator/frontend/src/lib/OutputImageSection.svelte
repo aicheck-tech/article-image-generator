@@ -7,11 +7,14 @@
 <div class="output-image-section">
     <span class="output-prompt">
         <h3>Article: </h3>
-        <slot name="article">
+        {#if $$slots.prompt}
+            <slot name="article"></slot>
+        {:else if $$slots.prompt == undefined}
             <p class="placeholder">
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Asperiores, reiciendis aliquid mollitia quia, ducimus iste voluptas inventore vero ipsam accusamus iure incidunt ullam numquam sequi. Odio ipsam iusto voluptate molestias optio. Necessitatibus, natus temporibus. Placeat consequuntur vitae ullam libero, quidem enim ipsa assumenda accusantium doloremque quibusdam odio, aut dolor rerum, voluptate corporis ipsam alias modi temporibus ut distinctio neque id cupiditate totam. Atque voluptate optio ullam molestias sequi odit eos praesentium, at quidem debitis neque voluptatem unde sunt ipsum adipisci quisquam ad porro dolor quia accusantium nulla aperiam exercitationem quae tenetur?
+                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Asperiores, reiciendis aliquid mollitia quia, ducimus iste voluptas inventore vero ipsam accusamus iure incidunt ullam numquam sequi. Odio ipsam iusto voluptate molestias optio. Necessitatibus, natus temporibus. Placeat consequuntur vitae ullam libero, quidem enim ipsa assumenda accusantium doloremque quibusdam odio.
             </p>
-        </slot>
+        {/if}
+
         <h3>Prompt: </h3>
         <slot name="prompt">
             <p class="placeholder">
@@ -28,6 +31,8 @@
 </div>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Flow+Circular&display=swap');
+
     h3 {
         margin: 0;
         color: rgba(var(--color-text), 0.8);
