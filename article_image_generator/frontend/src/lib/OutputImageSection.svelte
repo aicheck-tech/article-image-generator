@@ -2,25 +2,29 @@
     import Loader from "@lib/LoaderIcon.svelte";
 
     export let image = undefined;
+    export let article = undefined;
+    export let prompt = undefined;
 </script>
 
 <div class="output-image-section">
     <span class="output-prompt">
         <h3>Article: </h3>
-        {#if $$slots.prompt}
-            <slot name="article"></slot>
-        {:else if $$slots.prompt == undefined}
-            <p class="placeholder">
+        {#if article}
+            <span>{article}</span>
+        {:else}
+            <span class="placeholder">
                 Lorem ipsum, dolor sit amet consectetur adipisicing elit. Asperiores, reiciendis aliquid mollitia quia, ducimus iste voluptas inventore vero ipsam accusamus iure incidunt ullam numquam sequi. Odio ipsam iusto voluptate molestias optio. Necessitatibus, natus temporibus. Placeat consequuntur vitae ullam libero, quidem enim ipsa assumenda accusantium doloremque quibusdam odio.
-            </p>
+            </span>
         {/if}
 
         <h3>Prompt: </h3>
-        <slot name="prompt">
-            <p class="placeholder">
+        {#if prompt}
+            <span>{prompt}</span>
+        {:else}
+            <span class="placeholder">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit repellat consequuntur dolore esse molestiae quia necessitatibus, deserunt harum repellendus quod.
-            </p>
-        </slot>
+            </span>
+        {/if}
     </span>
     {#if image}
         <img class="output-image" src={image} alt="output" />
@@ -112,35 +116,6 @@
             background: rgba(var(--color-tertiary), 0.5);
         }
     }
-
-    /* .placeholder {
-        font-family: 'Flow Circular', cursive;
-        color: rgb(var(--color-secondary));
-        font-size: 1.1em;
-        background: -webkit-linear-gradient(right, #dadada, #626262, #dadada);
-        background: -moz-linear-gradient(right, #dadada, #626262, #dadada);
-        background: -o-linear-gradient(right, #dadada, #626262, #dadada);
-        background: linear-gradient(right, #dadada, #626262, #dadada);
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -o-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-        -o-text-fill-color: transparent;
-        color: transparent;
-        animation: gradientMove 2s linear infinite;
-    }
-
-    @keyframes gradientMove {
-        0% {
-            background-position: 0 0;
-        }
-
-        100% {
-            background-position: 70vw 0;
-        }
-    } */
 
     .placeholder {
         font-family: 'Flow Circular', cursive;

@@ -41,7 +41,7 @@ class ArticleImageGenerator:
         similarity_vector = tensor_similarity.cpu().numpy()  # [[similarity, 1-similarity]]
         confidence = similarity_vector[0][0]
         self._save_output(text, image, confidence, prompt)
-        return {"image_bytes": image.tobytes(), "confidence": confidence, "prompt": prompt}
+        return {"pil_image": image, "confidence": confidence, "prompt": prompt}
 
     def _save_output(self,
                      summarized_text: str,

@@ -2,6 +2,7 @@
 public
 *.local
 *.vscode
+logs
 
 # Custom
 *.json

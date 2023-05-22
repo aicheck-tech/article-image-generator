@@ -6,8 +6,8 @@
     import OutputImageSection from "@lib/OutputImageSection.svelte";
 
     const tags = ["realistic", "cinematic", "cartoon", "sketch"];
-    let default_item = 0;
-
+    let image_look;
+    let textarea_value: string = "";
     let outputs: Array<{image: string, article: string, prompt: string}> = [
         {
             image: "https://picsum.photos/512/512",
@@ -16,10 +16,42 @@
         }
     ];
 
-    function textToImage(text:string): string {
-        
+    async function textToImage(text:string): Promise<{ image_base64: string; prompt: string; confidence: number; }> {
+        const obj = { 
+            text_for_processing: text,
+            image_look: image_look 
+        };
 
-        return "";
+        const request = new Request("/backend/text-to-image", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(obj),
+        });
+
+        const output = await fetch(request);
+        const data = await output.json();
+        return {
+            image_base64: data.image_base64,
+            prompt: data.prompt,
+            confidence: data.confidence
+        };
+    }
+
+    async function imagine() {
+        outputs.push({
+            image: undefined,
+            article: textarea_value,
+            prompt: undefined
+        });
+        outputs = outputs;
+
+        textToImage(textarea_value).then((data) => {
+            outputs[outputs.length - 1].image = `data:image/png;base64,${data.image_base64}`;
+            outputs[outputs.length - 1].prompt = data.prompt;
+            outputs = outputs;
+        });
     }
 
     onMount(() => {
@@ -35,24 +67,29 @@
     </section>
 
     <section class="input-panel">
-        <textarea class="article-textarea group" placeholder="Insert you article here..." />
+        <textarea bind:value={textarea_value} class="article-textarea group" placeholder="Insert you article here..." />
         
         <section class="group input-panel-settings">
-            <Dropdown border_radius={["top-left", "top-right"]} default_item={default_item} tags={tags} />
-            <button style="border-radius: 0 0 var(--border-radius) var(--border-radius)">Imagine</button>
+            <Dropdown 
+                name="Type" 
+                border_radius={["top-left", "top-right"]} 
+                current_item_id={0} 
+                items={["summarization", "key words"]} 
+            />
+            <Dropdown 
+                name="Look" 
+                border_radius={[]} 
+                current_item_id={0} 
+                items={tags}
+                bind:current_item={image_look} 
+            />
+            <button on:click={imagine} style="border-radius: 0 0 var(--border-radius) var(--border-radius)">Imagine</button>
         </section>
     </section>
 
     <output class="output-panel">
         {#each outputs.slice().reverse() as output }
-            {#if output.image != undefined}
-                <OutputImageSection image={output.image}>
-                    <span slot="article">{output.article}</span>                
-                    <span slot="prompt">{output.prompt}</span>
-                </OutputImageSection>
-            {:else}
-                <OutputImageSection image={output.image} />
-            {/if}
+            <OutputImageSection image={output.image} article={output.article} prompt={output.prompt} />
         {/each}
     </output>
 </main>

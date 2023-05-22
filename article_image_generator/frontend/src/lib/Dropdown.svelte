@@ -1,32 +1,32 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    export let default_item: number;
-    export let tags: string[];
+    export let name: string;
+    export let current_item_id: number;
+    export let items: string[];
     export let border_radius: Array<"top-left" | "top-right" | "bottom-left" | "bottom-right"> | ["all"];
 
     import arrow_forward from "@assets/icons/arrow_forward_fill.png";
     import design_services from "@assets/icons/design_services_fill.png";
-    
-    let current_tag = tags[default_item];
-    let dropdown: HTMLDivElement = null;
+
+    export let current_item = items[current_item_id];
 
     onMount(() => {
-        dropdown.setAttribute("tabindex", "0");
+        document.getElementById("dropdown").setAttribute("tabindex", "0");
     });
 </script>
 
-<div class="dropdown border-radius-{border_radius.join(" border-radius-")}" bind:this={dropdown}>
+<div class="dropdown border-radius-{border_radius.join(" border-radius-")}" id="dropdown">
     <div class="group">
         <img src={design_services} alt="design_services" />
-        <span>Look: {current_tag}</span>
+        <span>{name}: {current_item}</span>
     </div>
     <img src={arrow_forward} alt="arrow_forward" />
     <div class="dropdown-content">
-        {#each tags as tag}
+        {#each items as item}
             <label class="tag">
-                <input tabindex="0" type="radio" name="tags" value={tag} bind:group={current_tag} />
-                {tag}
+                <input tabindex="0" type="radio" name={name} value={item} bind:group={current_item} />
+                {item}
             </label>
         {/each}
     </div>
