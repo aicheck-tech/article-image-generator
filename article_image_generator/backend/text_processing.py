@@ -10,8 +10,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from article_image_generator.backend.errors import NotFoundAnyTerm
 from article_image_generator.service import service
 from article_image_generator.settings import (
-    OPENAI_API_VERSION, OPENAI_ENCODING_NAME, OPENAI_SUMMARIZE_SYSTEM_TEXT,
-    OPENAI_SUMMARIZATION_MAX_TOKENS, OPENAI_PROMPT_SYSTEM_TEXT, OPENAI_TEXT_TO_PROMPT_MAX_TOKENS,
+    OPENAI_API_VERSION, OPENAI_ENCODING_NAME, OPENAI_SUMMARIZE_SYSTEM_TEXT, OPENAI_KEYWORDS_TO_PROMPT_SYSTEM_TEXT, OPENAI_KEYWORDS_TO_PROMPT_MAX_TOKENS,
+    OPENAI_SUMMARIZATION_MAX_TOKENS, OPENAI_TEXT_TO_PROMPT_SYSTEM_TEXT, OPENAI_TEXT_TO_PROMPT_MAX_TOKENS,
     OPENAI_SUMMARIZE_TEXTS_LONGER_THAN_N_TOKENS, OPENAI_API_KEY, OPENAI_API_ENGINE_COMPLETION, OPENAI_API_ENGINE_EMBEDDING, OPENAI_CUSTOM_DOMAIN
 )
 
@@ -87,6 +87,7 @@ class TextProcessing:
         return float(self.COSSIM(vector_1, vector_2).item())
 
     def tf_idf(self, text: str) -> Dict[str, float]:
+        """Calculate tf-idf score for each term in text"""
         tfidf_matrix = self.TFIDF.fit_transform([text])
         feature_names = self.TFIDF.get_feature_names_out()
         tfidf_scores = tfidf_matrix[0].toarray().flatten()
@@ -141,6 +142,7 @@ class TextProcessing:
         logger.debug(response)
         logger.info("Summarized text %s.", response["choices"][0]["text"])
         return response["choices"][0]["text"]
+        
 
     def text_to_prompt(self, text: str, tags: List[str]) -> str:
         """Text to prompt ready for image generation.
@@ -158,7 +160,7 @@ class TextProcessing:
             {
                 "role": "system",
                 "content": (
-                        OPENAI_PROMPT_SYSTEM_TEXT +
+                        OPENAI_TEXT_TO_PROMPT_SYSTEM_TEXT +
                         (
                             f"The design should be {', '.join(tags)}\n\n"
                             "Annotate it as:\n"
@@ -191,6 +193,58 @@ class TextProcessing:
         result = re.search(r"^'prompt': (.*)$", answer)
 
         return result.group(1)
+    
+    def keywords_to_prompt(self, keywords: List[str], tags: List[str]) -> str:
+        """Text to prompt ready for image generation.
+
+        Args:
+            text: Text from article
+            tags: List of tags to create more fitting prompt
+
+        Returns: generated prompt
+        """
+        logger.debug(keywords)
+        keywords_str = ", ".join(keywords)
+        logger.info(f"Generating prompt from keywords {keywords_str}.")
+
+        clean_batch = keywords_str.replace("\n", " ").strip()
+        prompt = self._encode_prompt([
+            {
+                "role": "system",
+                "content": (
+                        OPENAI_KEYWORDS_TO_PROMPT_SYSTEM_TEXT +
+                        (
+                            f"The design should be {', '.join(tags)}\n\n"
+                            "Annotate it as:\n"
+                            "'prompt': <the prompt>"
+                        )
+                )
+            },
+            {
+                "role": "user",
+                "content": f"'keywords': {clean_batch}"
+            }
+        ])
+        logger.debug(prompt)
+
+        max_tokens = self.count_tokens(prompt) + OPENAI_KEYWORDS_TO_PROMPT_MAX_TOKENS
+        logger.info("Text to prompt max tokens: %s", max_tokens)
+        response = openai.Completion.create(
+            engine=self.OPENAI_API_ENGINE_COMPLETION,
+            prompt=prompt,
+            temperature=0,
+            max_tokens=max_tokens,
+            top_p=0.95,
+            frequency_penalty=0,
+            presence_penalty=0,
+            stop=["<|im_end|>"]
+        )
+
+        logger.debug(response)
+        answer = response["choices"][0]["text"]
+
+        result = re.search(r"^'prompt': (.*)$", answer)
+        return result.group(1)
 
     def text_to_tagged_prompt(self, text, tags: List[str]) -> str:
         """
@@ -222,3 +276,18 @@ def text_processing() -> TextProcessing:
         OPENAI_API_ENGINE_COMPLETION,
         OPENAI_API_ENGINE_EMBEDDING,
         OPENAI_CUSTOM_DOMAIN)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    ok = text_processing = TextProcessing(
+        OPENAI_API_KEY,
+        OPENAI_API_ENGINE_COMPLETION,
+        OPENAI_API_ENGINE_EMBEDDING,
+        OPENAI_CUSTOM_DOMAIN)
+    text = "This IDC Survey Spotlight highlights the approximate share of business process services (BPS) providers' customers that utilize Microsoft Azure, SAP, AWS, Oracle, Google Cloud, IBM Cloud, and other platforms as part of the outsourced finance business process services delivered to them. The data depicted in this document is from a 2022 Finance and Accounting Cloud BPS Survey, which included quantitative and qualitative feedback from nine finance and accounting BPS providers."
+    keywords = ok.extract_keywords(text)
+    print(keywords)
+    keywords = [keyword[0] for keyword in keywords]
+    keywords = keywords[:5]
+    print(ok.keywords_to_prompt(keywords, ["realistic", "concept art"]))
