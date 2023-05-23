@@ -10,7 +10,6 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-import PIL
 
 from article_image_generator.backend.pipeline import load_pipeline
 from article_image_generator.settings import DEBUG, IMAGE_STYLES
@@ -48,7 +47,7 @@ def text_to_image_response(
 
     return JSONResponse(status_code=200, content={
         "prompt": output["prompt"],
-        "confidence": float(output["confidence"]),
+        # "confidence": float(output["confidence"]),
         "image_base64": image_base64
     })
 

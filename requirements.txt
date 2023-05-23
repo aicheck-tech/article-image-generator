@@ -12,6 +12,7 @@ tiktoken
 # Torch
 torch
 torchvision
+scikit-learn
 
 # transformers
 datasets
