@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from article_image_generator.backend.pipeline import load_pipeline
+from article_image_generator.backend.pipeline import load_pipeline_from_keywords, load_pipeline_by_summarization
 from article_image_generator.settings import DEBUG, IMAGE_STYLES
 
 PATH = Path(__file__).parent/"public"
@@ -36,7 +36,7 @@ def text_to_image_response(
     text_for_processing = text_and_look.text_for_processing
     image_look = text_and_look.image_look
         
-    article_image_generator = load_pipeline()
+    article_image_generator = load_pipeline_by_summarization()
     output: Dict[str, Union[bytes, float, str]] = article_image_generator.main(text_for_processing, IMAGE_STYLES[image_look])
 
     image = output["pil_image"]

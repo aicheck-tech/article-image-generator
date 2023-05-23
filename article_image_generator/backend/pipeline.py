@@ -2,7 +2,7 @@ import base64
 import json
 import io
 import os
-from typing import List, Dict, Union
+from typing import List, Dict
 
 from PIL import Image
 import requests
@@ -15,28 +15,13 @@ from article_image_generator.service import service
 
 STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
 
-
 class ArticleImageGenerator:
     def __init__(self, stability_api_key: str):
         self.text_processor = text_processing()
         self.stability_api_key = stability_api_key
 
-    def main(self, text: str, tags: List[str]) -> Dict[str, Union[float, Image.Image]]:
-        """
-
-        Args:
-            text: article content or summary or heading
-            tags: manually and automatically annotated tags describing content of article
-
-        Returns: dict containing image bytes and confidence score <0, 1>
-
-        """
-        summmarized_text = self.text_processor.summarize_text(text)
-        prompt: str = self.text_processor.text_to_tagged_prompt(summmarized_text, tags)
-        image: Image.Image = self._prompt_to_image_with_stability_api(prompt)
-        self._save_output(text, image, prompt)
-        return {"pil_image": image, "prompt": prompt}
-
+    def main(self, text: str, tags: List[str]) -> Dict[str, Image.Image]: pass
+    
     def _save_output(self,
                      summarized_text: str,
                      image: Image.Image,
@@ -62,10 +47,20 @@ class ArticleImageGenerator:
         return save_path
 
     def _prompt_to_image_with_stability_api(self,
-                                            prompt: str,
+                                            prompt: List[Dict[str, float]],
                                             height: int = 512,
                                             width: int = 512,
                                             steps: int = 20) -> Image.Image:
+        """Generates an image using the stability API.
+            example prompt:
+            [
+              {
+                'text': 'A lighthouse on a cliff',
+                'weight': 0.5
+              }
+            ]
+        """
+        
         response = requests.post(
             STABILITY_GENERATION_URL,
             headers={
@@ -74,11 +69,7 @@ class ArticleImageGenerator:
                 "Authorization": f"Bearer {self.stability_api_key}"
             },
             json={
-                "text_prompts": [
-                    {
-                        "text": prompt
-                    }
-                ],
+                "text_prompts": prompt,
                 "cfg_scale": 7,
                 "height": height,
                 "width": width,
@@ -102,9 +93,64 @@ class ArticleImageGenerator:
         image_buffer = io.BufferedReader(io.BytesIO(image_bytes))
         return Image.open(image_buffer)
 
-@service
-def load_pipeline() -> ArticleImageGenerator:
-    return ArticleImageGenerator(stability_api_key=STABILITY_API_KEY)
 
+class ArticleImageGeneratorSummarization(ArticleImageGenerator):
+    
+    def __init__(self, stability_api_key: str):
+        super().__init__(stability_api_key)
+
+    def main(self, text: str, tags: List[str]) -> Dict[str, float]:
+        """
+
+        Args:
+            text: article content or summary or heading
+            tags: manually and automatically annotated tags describing content of article
+
+        Returns: dict containing image bytes and prompt
+
+        """
+        summmarized_text = self.text_processor.summarize_text(text)
+        prompt: str = self.text_processor.text_to_tagged_prompt(summmarized_text, tags)
+        prompt: List[Dict[str, float]] = self.text_processor.prompt_to_list_of_dicts(prompt)
+        image: Image.Image = self._prompt_to_image_with_stability_api(prompt)
+        self._save_output(text, image, prompt)
+        return {"pil_image": image, "prompt": prompt}
+
+
+class ArticleImageGeneratorKeywords(ArticleImageGenerator):
+    
+    def __init__(self, stability_api_key: str):
+        super().__init__(stability_api_key)
+        self.PERCENTAGE_OF_KEYWORDS = 0.2
+
+    def main(self, text: str, tags: List[str]) -> Dict[str, float]:
+        """
+
+        Args:
+            text: article content or summary or heading
+            tags: manually and automatically annotated tags describing content of article
+
+        Returns: dict containing image bytes, prompt and keywords
+
+        """
+        keywords = self.text_processor.extract_keywords(text)
+        keywords = [keyword[0] for keyword in keywords]
+        keywords = keywords[:round(len(keywords)*self.PERCENTAGE_OF_KEYWORDS)]
+        prompt: str = self.text_processor.keywords_to_prompt(keywords, tags)
+        image: Image.Image = self._prompt_to_image_with_stability_api(prompt)
+        self._save_output(text, image, prompt)
+        return {"pil_image": image, "prompt": prompt, "keywords": keywords}
+
+
+
+@service
+def load_pipeline_from_keywords() -> ArticleImageGeneratorKeywords:
+    """Load pipeline for generating images from keywords"""
+    return ArticleImageGeneratorKeywords(stability_api_key=STABILITY_API_KEY)
+
+@service
+def load_pipeline_by_summarization() -> ArticleImageGeneratorSummarization:
+    """Load pipeline for generating images from summarization"""
+    return ArticleImageGeneratorSummarization(stability_api_key=STABILITY_API_KEY)
 
 
