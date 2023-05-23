@@ -276,18 +276,3 @@ def text_processing() -> TextProcessing:
         OPENAI_API_ENGINE_COMPLETION,
         OPENAI_API_ENGINE_EMBEDDING,
         OPENAI_CUSTOM_DOMAIN)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    ok = text_processing = TextProcessing(
-        OPENAI_API_KEY,
-        OPENAI_API_ENGINE_COMPLETION,
-        OPENAI_API_ENGINE_EMBEDDING,
-        OPENAI_CUSTOM_DOMAIN)
-    text = "This IDC Survey Spotlight highlights the approximate share of business process services (BPS) providers' customers that utilize Microsoft Azure, SAP, AWS, Oracle, Google Cloud, IBM Cloud, and other platforms as part of the outsourced finance business process services delivered to them. The data depicted in this document is from a 2022 Finance and Accounting Cloud BPS Survey, which included quantitative and qualitative feedback from nine finance and accounting BPS providers."
-    keywords = ok.extract_keywords(text)
-    print(keywords)
-    keywords = [keyword[0] for keyword in keywords]
-    keywords = keywords[:5]
-    print(ok.keywords_to_prompt(keywords, ["realistic", "concept art"]))
