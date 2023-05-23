@@ -50,7 +50,8 @@ class ArticleImageGenerator:
                                             prompt: List[Dict[str, float]],
                                             height: int = 512,
                                             width: int = 512,
-                                            steps: int = 20) -> Image.Image:
+                                            steps: int = 20,
+                                            samples: int=1) -> Image.Image:
         """Generates an image using the stability API.
             example prompt:
             [
@@ -73,7 +74,7 @@ class ArticleImageGenerator:
                 "cfg_scale": 7,
                 "height": height,
                 "width": width,
-                "samples": 1,
+                "samples": samples,
                 "steps": steps,
             },
         )
