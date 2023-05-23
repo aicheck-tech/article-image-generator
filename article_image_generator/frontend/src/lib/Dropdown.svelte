@@ -1,15 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
-
-    export let name: string;
-    export let current_item_id: number;
-    export let items: string[];
-    export let border_radius: Array<"top-left" | "top-right" | "bottom-left" | "bottom-right"> | ["all"];
-
     import arrow_forward from "@assets/icons/arrow_forward_fill.png";
     import design_services from "@assets/icons/design_services_fill.png";
 
+    export let name: string;
+    export let items: string[];
+    export let current_item_id: number;
     export let current_item = items[current_item_id];
+    export let border_radius: Array<"top-left" | "top-right" | "bottom-left" | "bottom-right"> | ["all"];
 
     onMount(() => {
         document.getElementById("dropdown").setAttribute("tabindex", "0");

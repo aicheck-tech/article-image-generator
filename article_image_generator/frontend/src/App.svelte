@@ -4,48 +4,26 @@
     import favicon from "@assets/favicon.ico";
     import Dropdown from "@lib/Dropdown.svelte";
     import OutputImageSection from "@lib/OutputImageSection.svelte";
+    import { textToImage } from "@scripts/api-calls"
 
     const tags = ["realistic", "cinematic", "cartoon", "sketch"];
 
     let image_look: string;
     let textarea_value: string = "";
-    let outputs: Array<{image: string, article: string, prompt: string}> = [];
-
-    async function textToImage(text:string): Promise<{ image_base64: string; prompt: string; confidence: number; }> {
-        const obj = { 
-            text_for_processing: text,
-            image_look: image_look 
-        };
-
-        const request = new Request("/backend/text-to-image", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(obj),
-        });
-
-        const output = await fetch(request);
-        const data = await output.json();
-        return {
-            image_base64: data.image_base64,
-            prompt: data.prompt,
-            confidence: data.confidence
-        };
-    }
+    let output_of_generated_objects: Array<{image: string, article: string, prompt: string}> = [];
 
     async function imagine() {
-        outputs.push({
+        output_of_generated_objects.push({
             image: undefined,
             article: textarea_value,
             prompt: undefined
         });
-        outputs = outputs;
+        output_of_generated_objects = output_of_generated_objects;
 
-        textToImage(textarea_value).then((data) => {
-            outputs[outputs.length - 1].image = `data:image/png;base64,${data.image_base64}`;
-            outputs[outputs.length - 1].prompt = data.prompt;
-            outputs = outputs;
+        textToImage(textarea_value, image_look).then((data) => {
+            output_of_generated_objects[output_of_generated_objects.length - 1].image = `data:image/png;base64,${data.image_base64}`;
+            output_of_generated_objects[output_of_generated_objects.length - 1].prompt = data.prompt;
+            output_of_generated_objects = output_of_generated_objects;
         });
     }
 
@@ -83,7 +61,7 @@
     </section>
 
     <output class="output-panel">
-        {#each outputs.slice().reverse() as output }
+        {#each output_of_generated_objects.slice().reverse() as output }
             <OutputImageSection image={output.image} article={output.article} prompt={output.prompt} />
         {/each}
     </output>

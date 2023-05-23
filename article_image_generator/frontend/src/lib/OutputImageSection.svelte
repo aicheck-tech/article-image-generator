@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Loader from "@lib/LoaderIcon.svelte";
+    import LoaderIcon from "@lib/LoaderIcon.svelte";
 
     export let image = undefined;
     export let article = undefined;
@@ -29,7 +29,7 @@
     {#if image}
         <img class="output-image" src={image} alt="output" />
     {:else}
-        <div class="image-placeholder output-image"><Loader/></div>
+        <div class="image-placeholder output-image"><LoaderIcon/></div>
     {/if}
 
 </div>
