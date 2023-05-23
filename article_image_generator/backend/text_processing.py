@@ -242,9 +242,8 @@ class TextProcessing:
 
         logger.debug(response)
         answer = response["choices"][0]["text"]
-
-        result = re.search(r"^'prompt': (.*)$", answer)
-        return result.group(1)
+        result = answer.split("'prompt': ")[1]
+        return result
 
     def text_to_tagged_prompt(self, text, tags: List[str]) -> str:
         """

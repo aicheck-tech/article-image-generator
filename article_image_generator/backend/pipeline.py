@@ -7,7 +7,7 @@ from typing import List, Dict
 from PIL import Image
 import requests
 
-from article_image_generator.settings import BACKEND_LOG_PATH, STABILITY_GENERATION_URL
+from article_image_generator.settings import BACKEND_LOG_PATH, STABILITY_GENERATION_URL, NEGATIVE_PROMPT_KEYWORDS, STEPS, SAMPLES
 from article_image_generator.backend.errors import BadPromptError
 from article_image_generator.backend.text_processing import text_processing
 from article_image_generator.service import service
@@ -23,12 +23,14 @@ class ArticleImageGenerator:
     def main(self, text: str, tags: List[str]) -> Dict[str, Image.Image]: pass
     
     def _save_output(self,
+                     type: str,
                      summarized_text: str,
                      image: Image.Image,
                      prompt: str) -> None:
         json_output_path = self._generate_free_file_name()
         img_output_path = json_output_path.with_suffix(".jpg") 
         json_data = {
+            "type": type,
             "text": summarized_text,
             "prompt": prompt,
             "image": f"{img_output_path}"
@@ -112,9 +114,9 @@ class ArticleImageGeneratorSummarization(ArticleImageGenerator):
         """
         summmarized_text = self.text_processor.summarize_text(text)
         prompt: str = self.text_processor.text_to_tagged_prompt(summmarized_text, tags)
-        prompt: List[Dict[str, float]] = self.text_processor.prompt_to_list_of_dicts(prompt)
+        prompt: List[Dict[str, float]] = [{"text": prompt, "weight": 1.0}] + NEGATIVE_PROMPT_KEYWORDS
         image: Image.Image = self._prompt_to_image_with_stability_api(prompt)
-        self._save_output(text, image, prompt)
+        self._save_output("Summarization",summmarized_text, image, prompt)
         return {"pil_image": image, "prompt": prompt}
 
 
@@ -138,8 +140,9 @@ class ArticleImageGeneratorKeywords(ArticleImageGenerator):
         keywords = [keyword[0] for keyword in keywords]
         keywords = keywords[:round(len(keywords)*self.PERCENTAGE_OF_KEYWORDS)]
         prompt: str = self.text_processor.keywords_to_prompt(keywords, tags)
-        image: Image.Image = self._prompt_to_image_with_stability_api(prompt)
-        self._save_output(text, image, prompt)
+        prompt: List[Dict[str, float]] = [{"text": prompt, "weight": 1.0}] + NEGATIVE_PROMPT_KEYWORDS
+        image: Image.Image = self._prompt_to_image_with_stability_api(prompt, steps=STEPS, samples=SAMPLES)
+        self._save_output("Keywords", text, image, prompt)
         return {"pil_image": image, "prompt": prompt, "keywords": keywords}
 
 
