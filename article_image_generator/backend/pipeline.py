@@ -2,11 +2,10 @@ import base64
 import json
 import io
 import os
-from typing import List, Dict, Tuple, Union
+from typing import List, Dict, Union
 
 from PIL import Image
 import requests
-import torch
 
 from article_image_generator.settings import BACKEND_LOG_PATH, STABILITY_GENERATION_URL
 from article_image_generator.backend.errors import BadPromptError
@@ -36,7 +35,7 @@ class ArticleImageGenerator:
         prompt: str = self.text_processor.text_to_tagged_prompt(summmarized_text, tags)
         image: Image.Image = self._prompt_to_image_with_stability_api(prompt)
         self._save_output(text, image, prompt)
-        return {"image_bytes": image.tobytes()}
+        return {"pil_image": image, "prompt": prompt}
 
     def _save_output(self,
                      summarized_text: str,

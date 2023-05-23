@@ -20,6 +20,7 @@
             "@/*": ["src/*"],
             "@assets/*": ["src/assets/*"],
             "@lib/*": ["src/lib/*"],
+            "@scripts/*": ["src/scripts/*"],
         }
     },
     "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "pages/*.ts"],

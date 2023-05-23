@@ -1,38 +1,45 @@
-<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+<div class="loader-ellipsis"><div></div><div></div><div></div><div></div></div>
 
+<!-- FIXME variables not perfect -->
 <style>
-    .lds-ellipsis {
+    .loader-ellipsis {
         display: inline-block;
         position: relative;
-        width: 80px;
-        height: 80px;
+        width: var(--loader-size);
+        height: var(--loader-size);
     }
-    .lds-ellipsis div {
+
+    .loader-ellipsis div {
         position: absolute;
         top: 33px;
         width: 13px;
         height: 13px;
         border-radius: 50%;
-        background: #fff;
-        animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        background: rgb(var(--color-text));
+        animation-timing-function: var(--loader-animation-timing);
     }
-    .lds-ellipsis div:nth-child(1) {
+
+    .loader-ellipsis div:nth-child(1) {
         left: 8px;
-        animation: lds-ellipsis1 0.6s infinite;
+        animation: loader-ellipsis1 var(--loader-animation-duration) infinite;
     }
-    .lds-ellipsis div:nth-child(2) {
+
+    .loader-ellipsis div:nth-child(2) {
         left: 8px;
-        animation: lds-ellipsis2 0.6s infinite;
+        animation: loader-ellipsis2 var(--loader-animation-duration) infinite;
     }
-    .lds-ellipsis div:nth-child(3) {
+
+    .loader-ellipsis div:nth-child(3) {
         left: 32px;
-        animation: lds-ellipsis2 0.6s infinite;
+        animation: loader-ellipsis2 var(--loader-animation-duration) infinite;
     }
-    .lds-ellipsis div:nth-child(4) {
+
+    .loader-ellipsis div:nth-child(4) {
         left: 56px;
-        animation: lds-ellipsis3 0.6s infinite;
+        animation: loader-ellipsis3 var(--loader-animation-duration) infinite;
     }
-    @keyframes lds-ellipsis1 {
+
+    @keyframes loader-ellipsis1 {
         0% {
             transform: scale(0);
         }
@@ -40,7 +47,8 @@
             transform: scale(1);
         }
     }
-    @keyframes lds-ellipsis3 {
+
+    @keyframes loader-ellipsis3 {
         0% {
             transform: scale(1);
         }
@@ -48,7 +56,8 @@
             transform: scale(0);
         }
     }
-    @keyframes lds-ellipsis2 {
+
+    @keyframes loader-ellipsis2 {
         0% {
             transform: translate(0, 0);
         }
@@ -57,3 +66,4 @@
         }
     }
 </style>
+

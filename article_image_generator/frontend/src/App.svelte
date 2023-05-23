@@ -4,9 +4,28 @@
     import favicon from "@assets/favicon.ico";
     import Dropdown from "@lib/Dropdown.svelte";
     import OutputImageSection from "@lib/OutputImageSection.svelte";
+    import { textToImage } from "@scripts/api-calls"
 
     const tags = ["realistic", "cinematic", "cartoon", "sketch"];
-    let default_item = 0;
+
+    let image_look: string;
+    let textarea_value: string = "";
+    let output_of_generated_objects: Array<{image: string, article: string, prompt: string}> = [];
+
+    async function imagine() {
+        output_of_generated_objects.push({
+            image: undefined,
+            article: textarea_value,
+            prompt: undefined
+        });
+        output_of_generated_objects = output_of_generated_objects;
+
+        textToImage(textarea_value, image_look).then((data) => {
+            output_of_generated_objects[output_of_generated_objects.length - 1].image = `data:image/png;base64,${data.image_base64}`;
+            output_of_generated_objects[output_of_generated_objects.length - 1].prompt = data.prompt;
+            output_of_generated_objects = output_of_generated_objects;
+        });
+    }
 
     onMount(() => {
         let link = document.getElementById("favicon") as HTMLLinkElement;
@@ -21,22 +40,30 @@
     </section>
 
     <section class="input-panel">
-        <textarea class="article-textarea group" placeholder="Insert you article here..." />
+        <textarea bind:value={textarea_value} class="article-textarea group" placeholder="Insert you article here..." />
         
         <section class="group input-panel-settings">
-            <Dropdown border_radius="var(--border-radius) var(--border-radius) 0 0" default_item={default_item} tags={tags} />
-            <button style="border-radius: 0 0 var(--border-radius) var(--border-radius)">Imagine</button>
+            <Dropdown 
+                name="Type" 
+                border_radius={["top-left", "top-right"]} 
+                current_item_id={0} 
+                items={["summarization", "key words"]} 
+            />
+            <Dropdown 
+                name="Look" 
+                border_radius={[]} 
+                current_item_id={0} 
+                items={tags}
+                bind:current_item={image_look} 
+            />
+            <button on:click={imagine} style="border-radius: 0 0 var(--border-radius) var(--border-radius)">Imagine</button>
         </section>
     </section>
 
     <output class="output-panel">
-        <OutputImageSection></OutputImageSection>
-        <OutputImageSection image="https://picsum.photos/512/512">
-            <span slot="article">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.</span>
-        </OutputImageSection>
-        <OutputImageSection image="https://picsum.photos/512/512">
-            <span slot="article">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati praesentium, necessitatibus fugit tempora magni vero ea dignissimos. Eius, aperiam rerum quis dolore nisi repellendus sunt voluptatibus iste minima amet omnis.</span>
-        </OutputImageSection>
+        {#each output_of_generated_objects.slice().reverse() as output }
+            <OutputImageSection image={output.image} article={output.article} prompt={output.prompt} />
+        {/each}
     </output>
 </main>
 

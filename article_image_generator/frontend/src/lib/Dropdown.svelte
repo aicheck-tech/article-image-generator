@@ -1,32 +1,36 @@
 <script lang="ts">
     import { onMount } from "svelte";
-
-    export let default_item: number;
-    export let tags: string[];
-    export let border_radius: string = "var(--border-radius)";
-
     import arrow_forward from "@assets/icons/arrow_forward_fill.png";
     import design_services from "@assets/icons/design_services_fill.png";
-    
-    let current_tag = tags[default_item];
-    let dropdown;
+
+    export let name: string;
+    export let items: string[];
+    export let current_item_id: number;
+    export let current_item = items[current_item_id];
+    export let border_radius: Array<"top-left" | "top-right" | "bottom-left" | "bottom-right"> | ["all"];
 
     onMount(() => {
-        dropdown.setAttribute("tabindex", "0");
+        document.getElementById("dropdown").setAttribute("tabindex", "0");
     });
 </script>
 
-<div class="dropdown" bind:this={dropdown} style="border-radius: {border_radius};">
+<div class="dropdown border-radius-{border_radius.join(" border-radius-")}" id="dropdown">
     <div class="group">
         <img src={design_services} alt="design_services" />
-        <span>Look: {current_tag}</span>
+        <span>{name}: {current_item}</span>
     </div>
     <img src={arrow_forward} alt="arrow_forward" />
     <div class="dropdown-content">
-        {#each tags as tag}
+        {#each items as item}
             <label class="tag">
-                <input tabindex="0" type="radio" name="tags" value={tag} bind:group={current_tag} />
-                {tag}
+                <input 
+                    tabindex="0" 
+                    type="radio" 
+                    name={name} 
+                    value={item} 
+                    bind:group={current_item} 
+                />
+                {item}
             </label>
         {/each}
     </div>
@@ -126,5 +130,25 @@
         100% {
             transform: scaleX(1);
         }
+    }
+
+    .border-radius-top-left {
+        border-top-left-radius: var(--border-radius);
+    }
+
+    .border-radius-top-right {
+        border-top-right-radius: var(--border-radius);
+    }
+
+    .border-radius-bottom-left {
+        border-bottom-left-radius: var(--border-radius);
+    }
+
+    .border-radius-bottom-right {
+        border-bottom-right-radius: var(--border-radius);
+    }
+
+    .border-radius-all {
+        border-radius: var(--border-radius);
     }
 </style>
