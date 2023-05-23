@@ -6,6 +6,7 @@ from PIL import Image
 from article_image_generator.service import service
 
 class ClipClassification(nn.Module):
+    """ Not used yet"""
     def __init__(self) -> None:
         super().__init__()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
