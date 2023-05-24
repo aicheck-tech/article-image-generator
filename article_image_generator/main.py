@@ -19,7 +19,7 @@ PATH = Path(__file__).parent/"public"
 app = FastAPI()
 app.mount("/assets", StaticFiles(directory=PATH/"assets"), name="static")
 
-class TextToPromptRequest(BaseModel):
+class TextToImageRequest(BaseModel):
     text_for_processing: str
     image_look: Literal["realistic", "cinematic", "cartoon", "sketch"]
 
@@ -31,7 +31,7 @@ def main():
 
 @app.post("/backend/text-to-image", response_class=JSONResponse)
 def text_to_image_response(
-                        text_and_look: TextToPromptRequest
+                        text_and_look: TextToImageRequest
                         ) -> JSONResponse:
     text_for_processing = text_and_look.text_for_processing
     image_look = text_and_look.image_look
@@ -47,7 +47,6 @@ def text_to_image_response(
 
     return JSONResponse(status_code=200, content={
         "prompt": output["prompt"],
-        # "confidence": float(output["confidence"]),
         "image_base64": image_base64
     })
 

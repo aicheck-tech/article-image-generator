@@ -1,10 +1,12 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import MaskedIcon from "@lib/MaskedIcon.svelte";
     import arrow_forward from "@assets/icons/arrow_forward_fill.png";
-    import design_services from "@assets/icons/design_services_fill.png";
 
     export let name: string;
     export let items: string[];
+    export let icon: string = "https://picsum.photos/48/48";
+    export let alt: string = "dropdown_icon";
     export let current_item_id: number;
     export let current_item = items[current_item_id];
     export let border_radius: Array<"top-left" | "top-right" | "bottom-left" | "bottom-right"> | ["all"];
@@ -16,10 +18,10 @@
 
 <div class="dropdown border-radius-{border_radius.join(" border-radius-")}" id="dropdown">
     <div class="group">
-        <img src={design_services} alt="design_services" />
-        <span>{name}: {current_item}</span>
+        <MaskedIcon icon={icon} alt={alt} />
+        <span class="dropdown-text"><b>{name}</b>:<br>{current_item}</span>
     </div>
-    <img src={arrow_forward} alt="arrow_forward" />
+    <MaskedIcon icon={arrow_forward} alt="arrow_forward" />
     <div class="dropdown-content">
         {#each items as item}
             <label class="tag">
@@ -37,11 +39,6 @@
 </div>
 
 <style>
-    img {
-        height: 1.5em;
-        margin-right: 0.25em;
-    }
-
     .group {
         display: flex;
         flex-direction: row;
@@ -49,6 +46,11 @@
         justify-content: flex-start;
         gap: 0.5em;
         margin: 0 0.5em;
+    }
+
+    .dropdown-text {
+        text-align: left;
+        white-space: nowrap;
     }
 
     .dropdown {
@@ -61,7 +63,7 @@
         padding-top: 0.75em;
         padding-bottom: 0.75em;
 
-        border: 1px solid rgb(var(--color-tertiary));
+        border: 1px solid var(--color-tertiary);
     }
 
     .dropdown-content {
@@ -76,8 +78,8 @@
         min-width: 160px;
         box-sizing: border-box;
 
-        background-color: rgb(var(--color-primary));
-        border: 1px solid rgb(var(--color-tertiary));
+        background-color: var(--color-primary);
+        border: 1px solid var(--color-tertiary);
         border-radius: var(--border-radius);
 
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -117,7 +119,7 @@
     }
 
     .tag:hover {
-        background-color: rgb(var(--color-tertiary));
+        background-color: var(--color-tertiary);
     }
 
     @keyframes growDown {

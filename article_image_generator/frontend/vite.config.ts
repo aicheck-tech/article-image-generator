@@ -35,9 +35,6 @@ export default defineConfig({
                else if (/\.css$/.test(name ?? '')) {
                   return 'assets/css/[name]-[hash].[ext]';
                }
-               else if (/\.ts$/.test(name ?? '')) {
-                  return 'assets/js/[name]-[hash].[ext]';
-               }
 
                return 'assets/[name]-[hash].[ext]';
             },

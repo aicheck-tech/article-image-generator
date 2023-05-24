@@ -1,29 +1,50 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    
+
     import favicon from "@assets/favicon.ico";
     import Dropdown from "@lib/Dropdown.svelte";
     import OutputImageSection from "@lib/OutputImageSection.svelte";
-    import { textToImage } from "@scripts/api-calls"
+    import { textToImage } from "@scripts/api-calls";
+
+    import design_services_icon from "@assets/icons/design_services_fill.png"
+    import brush_icon from "@assets/icons/brush_fill.png"
 
     const tags = ["realistic", "cinematic", "cartoon", "sketch"];
 
     let image_look: string;
     let textarea_value: string = "";
-    let output_of_generated_objects: Array<{image: string, article: string, prompt: string}> = [];
+    let output_of_generated_objects: Array<{
+        image: string;
+        article: string;
+        prompt: string;
+    }> = [
+        {
+            image: "https://picsum.photos/512/512",
+            article: "Lorem ipsum",
+            prompt: "Lorem ipsum ale jinde",
+        },
+    ];
 
-    async function imagine() {
+    async function imagine(event) {
+        event.target.disabled = true;
+
         output_of_generated_objects.push({
             image: undefined,
             article: textarea_value,
-            prompt: undefined
+            prompt: undefined,
         });
         output_of_generated_objects = output_of_generated_objects;
 
         textToImage(textarea_value, image_look).then((data) => {
-            output_of_generated_objects[output_of_generated_objects.length - 1].image = `data:image/png;base64,${data.image_base64}`;
-            output_of_generated_objects[output_of_generated_objects.length - 1].prompt = data.prompt;
+            output_of_generated_objects[
+                output_of_generated_objects.length - 1
+            ].image = `data:image/png;base64,${data.image_base64}`;
+            output_of_generated_objects[
+                output_of_generated_objects.length - 1
+            ].prompt = data.prompt;
             output_of_generated_objects = output_of_generated_objects;
+
+            event.target.disabled = false;
         });
     }
 
@@ -35,34 +56,50 @@
 
 <main>
     <section class="title-panel">
-        <h1>Article image generator</h1>
-        <h2>Generate images for articles</h2>
+        <h1 class="invert">Article image generator</h1>
+        <h2 class="invert">Generate images for articles</h2>
     </section>
 
     <section class="input-panel">
-        <textarea bind:value={textarea_value} class="article-textarea group" placeholder="Insert you article here..." />
-        
+        <textarea
+            bind:value={textarea_value}
+            class="article-textarea group"
+            placeholder="Insert you article here..."
+        />
+
         <section class="group input-panel-settings">
-            <Dropdown 
-                name="Type" 
-                border_radius={["top-left", "top-right"]} 
-                current_item_id={0} 
-                items={["summarization", "key words"]} 
+            <Dropdown
+                name="Processing method"
+                border_radius={["top-left", "top-right"]}
+                current_item_id={0}
+                items={["summarization", "key words"]}
+                icon={design_services_icon}
             />
-            <Dropdown 
-                name="Look" 
-                border_radius={[]} 
-                current_item_id={0} 
+            <Dropdown
+                name="Look"
+                border_radius={[]}
+                current_item_id={0}
                 items={tags}
-                bind:current_item={image_look} 
+                bind:current_item={image_look}
+
+                icon={brush_icon}
             />
-            <button on:click={imagine} style="border-radius: 0 0 var(--border-radius) var(--border-radius)">Imagine</button>
+            <button
+                on:click={imagine}
+                style="border-radius: 0 0 var(--border-radius) var(--border-radius)"
+            >
+                <span class="invert">Imagine</span>
+            </button>
         </section>
     </section>
 
     <output class="output-panel">
-        {#each output_of_generated_objects.slice().reverse() as output }
-            <OutputImageSection image={output.image} article={output.article} prompt={output.prompt} />
+        {#each output_of_generated_objects.slice().reverse() as output}
+            <OutputImageSection
+                image={output.image}
+                article={output.article}
+                prompt={output.prompt}
+            />
         {/each}
     </output>
 </main>
@@ -76,7 +113,7 @@
         width: 100vw;
         height: 100vh;
 
-        background: rgb(var(--color-primary));
+        background: var(--color-primary);
     }
 
     button {
@@ -98,11 +135,15 @@
         flex-direction: column;
         align-items: flex-start;
 
-        background: rgb(var(--color-secondary));
+        background: var(--color-secondary);
 
-        border-bottom: 2px solid rgb(var(--color-tertiary));
+        border-bottom: 2px solid var(--color-tertiary);
 
         text-align: left;
+    }
+
+    .invert {
+        filter: invert(1);
     }
 
     .input-panel {
@@ -115,11 +156,11 @@
         gap: -0.5em;
 
         width: fit-content;
-        height:100%;
+        height: 100%;
 
         box-sizing: border-box;
 
-        border-right: 2px solid rgb(var(--color-tertiary));
+        border-right: 2px solid var(--color-tertiary);
     }
 
     .group {
@@ -141,29 +182,31 @@
         margin: 0.5em;
         padding: 0.5em;
 
-        background: rgb(var(--color-secondary));
+        background: var(--color-tertiary);
 
-        border: 1px solid rgb(var(--color-tertiary));
+        border: 1px solid var(--color-tertiary);
         border-radius: var(--border-radius);
+
+        color: var(--color-text);
     }
 
     .article-textarea::placeholder {
-        color: rgba(var(--color-text), 0.5);
+        color: var(--color-text);
 
-        font-family: 'Roboto Mono', monospace;
+        font-family: "Roboto Mono", monospace;
         font-weight: 300;
-        font-size: 0.9em;
+        font-size: 1em;
     }
 
     .article-textarea:focus {
-        border: 2px solid rgba(var(--color-text), 0.4);
+        border: 2px solid var(--color-text);
         outline: none;
     }
 
     .input-panel-settings {
         display: flex;
         flex-direction: column;
-        
+
         justify-content: space-between;
 
         margin: 0.5em;
@@ -173,7 +216,7 @@
         grid-row: 2;
         grid-column: 2;
 
-        background: rgb(var(--color-primary));
+        background: var(--color-primary);
 
         display: flex;
         flex-direction: column;

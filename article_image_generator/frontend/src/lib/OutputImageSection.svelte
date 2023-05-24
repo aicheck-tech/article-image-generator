@@ -39,7 +39,7 @@
 
     h3 {
         margin: 0;
-        color: rgba(var(--color-text), 0.8);
+        color: var(--color-text);
     }
 
     .output-image-section {
@@ -52,8 +52,8 @@
 
         box-sizing: border-box;
 
-        background: rgb(var(--color-primary));
-        border-bottom: 2px solid rgb(var(--color-tertiary));
+        background: var(--color-primary);
+        border-bottom: 2px solid var(--color-tertiary);
 
         margin: 0.5em;
     }
@@ -70,7 +70,7 @@
         font-size: 1em;
         font-weight: 600;
 
-        color: rgba(var(--color-text), 0.5);
+        color: var(--color-text);
 
         text-align: left;
         overflow-y: scroll;
@@ -91,7 +91,7 @@
         height: 20rem;
         aspect-ratio: 1/1;
 
-        background: rgba(var(--color-text), 0.1);
+        background: var(--color-text);
 
         border-radius: var(--border-radius);
 
@@ -119,7 +119,7 @@
 
     .placeholder {
         font-family: 'Flow Circular', cursive;
-        color: rgb(var(--color-tertiary));
+        color: var(--color-tertiary);
         font-size: 1.1em;
         margin-top: 0em;
 
@@ -130,15 +130,15 @@
 
     @keyframes blinking-text {
         0% {
-            color: rgb(var(--color-tertiary));
+            color: var(--color-tertiary);
         }
 
         40% {
-            color: rgb(var(--color-primary));
+            color: var(--color-primary);
         }
 
         100% {
-            color: rgb(var(--color-tertiary));
+            color: var(--color-tertiary);
         }
     }
 </style>
