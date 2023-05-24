@@ -20,7 +20,13 @@ class ArticleImageGenerator:
         self.text_processor = text_processing()
         self.stability_api_key = stability_api_key
 
-    def main(self, text: str, tags: List[str]) -> Dict[str, Image.Image]: pass
+    def main(self,
+             text: str,
+             tags: List[str],
+             height: int = 512,
+             width: int = 512,
+             steps: int = 20,
+             samples: int=1) -> Dict[str, Image.Image]: pass
     
     def _save_output(self,
                      type: str,
@@ -102,7 +108,13 @@ class ArticleImageGeneratorSummarization(ArticleImageGenerator):
     def __init__(self, stability_api_key: str):
         super().__init__(stability_api_key)
 
-    def main(self, text: str, tags: List[str]) -> Dict[str, float]:
+    def main(self,
+             text: str,
+             tags: List[str],
+             height: int = 512,
+             width: int = 512,
+             steps: int = 20,
+             samples: int=1) -> Dict[str, float]:
         """
 
         Args:
@@ -115,7 +127,7 @@ class ArticleImageGeneratorSummarization(ArticleImageGenerator):
         summmarized_text = self.text_processor.summarize_text(text)
         prompt: str = self.text_processor.text_to_tagged_prompt(summmarized_text, tags)
         prompt: List[Dict[str, float]] = [{"text": prompt, "weight": 1.0}] + NEGATIVE_PROMPT_KEYWORDS
-        image: Image.Image = self._prompt_to_image_with_stability_api(prompt)
+        image: Image.Image = self._prompt_to_image_with_stability_api(prompt,height=height, width=width, steps=steps, samples=samples)
         self._save_output("Summarization",summmarized_text, image, prompt)
         return {"pil_image": image, "prompt": prompt}
 
@@ -126,7 +138,13 @@ class ArticleImageGeneratorKeywords(ArticleImageGenerator):
         super().__init__(stability_api_key)
         self.PERCENTAGE_OF_KEYWORDS = 0.2
 
-    def main(self, text: str, tags: List[str]) -> Dict[str, float]:
+    def main(self,
+             text: str,
+             tags: List[str],
+             height: int = 512,
+             width: int = 512,
+             steps: int = 20,
+             samples: int=1) -> Dict[str, float]:
         """
 
         Args:
@@ -141,7 +159,7 @@ class ArticleImageGeneratorKeywords(ArticleImageGenerator):
         keywords = keywords[:round(len(keywords)*self.PERCENTAGE_OF_KEYWORDS)]
         prompt: str = self.text_processor.keywords_to_prompt(keywords, tags)
         prompt: List[Dict[str, float]] = [{"text": prompt, "weight": 1.0}] + NEGATIVE_PROMPT_KEYWORDS
-        image: Image.Image = self._prompt_to_image_with_stability_api(prompt, steps=STEPS, samples=SAMPLES)
+        image: Image.Image = self._prompt_to_image_with_stability_api(prompt,height=height, width=width, steps=steps, samples=samples)
         self._save_output("Keywords", text, image, prompt)
         return {"pil_image": image, "prompt": prompt, "keywords": keywords}
 
