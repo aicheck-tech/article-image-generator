@@ -137,6 +137,7 @@ class TextProcessing:
             top_p=0.95,
             frequency_penalty=0.3,
             presence_penalty=0,
+            timeout=10,
             stop=["<|im_end|>"])
 
         logger.debug(response)
@@ -184,6 +185,7 @@ class TextProcessing:
             top_p=0.95,
             frequency_penalty=0,
             presence_penalty=0,
+            timeout=10,
             stop=["<|im_end|>"]
         )
 
@@ -237,14 +239,14 @@ class TextProcessing:
             top_p=0.95,
             frequency_penalty=0,
             presence_penalty=0,
-            stop=["<|im_end|>"]
+            timeout=10,
+            stop=["<|im_end|>"],
         )
 
         logger.debug(response)
         answer = response["choices"][0]["text"]
-
-        result = re.search(r"^'prompt': (.*)$", answer)
-        return result.group(1)
+        result = answer.split("'prompt': ")[1]
+        return result
 
     def text_to_tagged_prompt(self, text, tags: List[str]) -> str:
         """
