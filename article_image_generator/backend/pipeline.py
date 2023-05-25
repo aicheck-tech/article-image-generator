@@ -112,7 +112,7 @@ class ArticleImageGeneratorSummarization(ArticleImageGenerator):
              tags: List[str],
              height: int = 512,
              width: int = 512,
-             steps: int = 20,
+             steps: int = 30,
              samples: int=1) -> Dict[str, float]:
         """
 

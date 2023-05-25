@@ -19,26 +19,25 @@ PATH = Path(__file__).parent/"public"
 app = FastAPI()
 app.mount("/assets", StaticFiles(directory=PATH/"assets"), name="static")
 
+aig_keywords = load_pipeline_from_keywords()
+aig_summarization = load_pipeline_by_summarization()
 class TextToPromptRequest(BaseModel):
     text_for_processing: str
     image_look: Literal["realistic", "cinematic", "cartoon", "sketch"]
+    steps: int = 30
+    samples: int = 1
 
 
 @app.get("/", response_class=FileResponse)
 def main():
     return PATH/"index.html"
 
-
-@app.post("/backend/text-to-image", response_class=JSONResponse)
-def text_to_image_response(
-                        text_and_look: TextToPromptRequest
-                        ) -> JSONResponse:
+def text_to_image(main_funcion, text_and_look: TextToPromptRequest) -> JSONResponse:
     text_for_processing = text_and_look.text_for_processing
     image_look = text_and_look.image_look
-        
-    article_image_generator = load_pipeline_by_summarization()
-    output: Dict[str, Union[bytes, float, str]] = article_image_generator.main(text_for_processing, IMAGE_STYLES[image_look])
-
+    steps = text_and_look.steps
+    samples = text_and_look.samples
+    output: Dict[str, Union[bytes, float, str]] = main_funcion(text_for_processing, IMAGE_STYLES[image_look], steps=steps, samples=samples)
     image = output["pil_image"]
     image_byte_arr = io.BytesIO()
     image.save(image_byte_arr, format='JPEG')
@@ -47,9 +46,16 @@ def text_to_image_response(
 
     return JSONResponse(status_code=200, content={
         "prompt": output["prompt"],
-        # "confidence": float(output["confidence"]),
         "image_base64": image_base64
     })
+
+@app.post("/backend/text-to-image/summarization", response_class=JSONResponse)
+def text_to_image_response_summarization(text_and_look: TextToPromptRequest) -> JSONResponse:
+    return text_to_image(aig_summarization.main, text_and_look)
+
+@app.post("/backend/text-to-image/keywords", response_class=JSONResponse)
+def text_to_image_response_keywords(text_and_look: TextToPromptRequest) -> JSONResponse:
+    return text_to_image(aig_keywords.main, text_and_look)
 
 
 if __name__ == "__main__":
