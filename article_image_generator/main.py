@@ -33,10 +33,10 @@ def main():
     return PATH/"index.html"
 
 def text_to_image(main_funcion, text_and_look: TextToPromptRequest) -> JSONResponse:
-    text_for_processing = text_and_look.text_for_processing
+    text_for_processing = text_and_look.text_for_processing[:2000] # Limit text to 2000 characters
     image_look = text_and_look.image_look
-    steps = text_and_look.steps
-    samples = text_and_look.samples
+    steps = max(min(text_and_look.steps, 90), 20)  # Limit steps between 20 and 90
+    samples = max(min(text_and_look.samples, 4), 1)  # Limit samples between 1 and 4
     output: Dict[str, Union[bytes, float, str]] = main_funcion(text_for_processing, IMAGE_STYLES[image_look], steps=steps, samples=samples)
     image = output["pil_image"]
     image_byte_arr = io.BytesIO()
