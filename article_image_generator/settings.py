@@ -43,8 +43,6 @@ OPENAI_KEYWORDS_TO_PROMPT_SYSTEM_TEXT = (
     "Generate a prompt for an image generator based on the keywords provided in a variable called 'keywords'.\n"
     "Examples of great prompt:\n"
     "'prompt': 'Create an image that represents the power of AI in customer data analysis. Imagine a futuristic dashboard that displays real-time customer data, with lines of code running in the background. The dashboard should highlight the advantage of using AI to analyze customer behavior, with inferred insights that can help businesses act quickly and bring value to their customers. The image should be cinematic and visually striking, with a composition that showcases the complexity and sophistication of the technology. Let your creativity flow and build a design that captures the essence of these keywords: customer, data, analyze, code, customers, inferred, 12, 30, act, advantage, ai, bring, and build.'\n\n"
-
-""
     "Examples of good prompts:\n"
     "'prompt': 'Imagine a breathtaking landscape with a majestic mountain range covered in snow, reflecting the vibrant colors of the sunrise. Capture the serenity of the scene and the crispness of the air.'\n\n"
     "'prompt': 'Create an image of an antique wooden chest adorned with intricate carvings and metal embellishments. Highlight the textures and reveal the history and craftsmanship through careful lighting.'\n\n"
@@ -58,19 +56,17 @@ OPENAI_KEYWORDS_TO_PROMPT_SYSTEM_TEXT = (
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_API_ENGINE_COMPLETION = os.getenv("OPENAI_API_ENGINE")
+OPENAI_API_ENGINE_COMPLETION = "gpt-35-turbo"
 OPENAI_API_ENGINE_EMBEDDING = "text-similarity-ada-001"
-OPENAI_CUSTOM_DOMAIN = os.getenv("OPENAI_CUSTOM_DOMAIN")
+OPENAI_CUSTOM_DOMAIN = "nextgen"
 
 # Stable Diffusion
 STABLE_DIFFUSION_HUGGING_FACE = "stabilityai/stable-diffusion-2-1"
 
 # DreamStudio API - Stable Diffusion
+STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
 STABILITY_ENGINE = "stable-diffusion-xl-beta-v2-2-2"
 STABILITY_GENERATION_URL = f"https://api.stability.ai/v1/generation/{STABILITY_ENGINE}/text-to-image"
-STEPS = 30
-SAMPLES = 1
-
 
 # Train settings
 TRAIN_TEST_SPLIT_RATIO = 0.9

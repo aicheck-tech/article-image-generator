@@ -7,13 +7,12 @@ from typing import List, Dict
 from PIL import Image
 import requests
 
-from article_image_generator.settings import BACKEND_LOG_PATH, STABILITY_GENERATION_URL, NEGATIVE_PROMPT_KEYWORDS, STEPS, SAMPLES
+from article_image_generator.settings import BACKEND_LOG_PATH, STABILITY_GENERATION_URL, NEGATIVE_PROMPT_KEYWORDS, STABILITY_API_KEY
 from article_image_generator.backend.errors import BadPromptError
 from article_image_generator.backend.text_processing import text_processing
 from article_image_generator.service import service
 
 
-STABILITY_API_KEY = os.getenv("STABILITY_API_KEY")
 
 class ArticleImageGenerator:
     def __init__(self, stability_api_key: str):
