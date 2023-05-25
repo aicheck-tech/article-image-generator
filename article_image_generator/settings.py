@@ -10,6 +10,7 @@ DEBUG = False
 BACKEND_LOG_PATH = Path("article_image_generator/backend/logs")
 
 # FastAPI
+FASTAPI_HOST = "127.0.0.1"
 FASTAPI_PORT = 8001
 FASTAPI_WORKERS = 1
 

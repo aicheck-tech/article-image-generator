@@ -6,7 +6,7 @@
     - [Technologies](#technologies)
     - [AI Models](#ai-models)
     - [Requirements](#requirements)
-    - [Example](#example)
+    - [Project preview](#project-preview)
 - [Getting Started](#getting-started)
 
 ## About
@@ -24,9 +24,15 @@ Article image generator is a web application that generates headline images for 
 1. [Python 3.9.2](https://www.python.org/downloads/) – Python serves as the primary programming language for the backend implementation.
 2. [NodeJS 18.16.0 LTS](https://nodejs.org/en) – NodeJS is essential for running the Svelte frontend and managing the necessary dependencies.
 
-### Example
+### Project preview
 
-<div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin:1rem;">
+  <p>Application design</p>
+  <!-- FIXME: Replace for newer img -->
+  <img src="aig.png">
+</div>
+Example:
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin:1rem;">
   <p>How Important Is Web3 and Decentralization to Industry Ecosystems?</p>
   <img src="example.jpg">
 </div>
@@ -74,6 +80,8 @@ python -m article_image_generator.main
 ```cmd
 python -m article_image_generator.main
 ```
+Optional
+5. In article_image_generator.settings you can change settings of all aspects of project
 
 ## scripts for testing
 ### javascript
