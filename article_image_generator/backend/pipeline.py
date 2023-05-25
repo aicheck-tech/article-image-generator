@@ -30,7 +30,7 @@ class ArticleImageGenerator:
     def _save_output(self,
                      type: str,
                      summarized_text: str,
-                     image: Image.Image,
+                     images: List[Image.Image],
                      prompt: str) -> None:
         json_output_path = self._generate_free_file_name()
         img_output_path = json_output_path.with_suffix(".jpg") 
@@ -40,7 +40,8 @@ class ArticleImageGenerator:
             "prompt": prompt,
             "image": f"{img_output_path}"
         }
-        image.save(img_output_path)
+        for i, image in enumerate(images):
+            image.save(f"{json_output_path}_{i}.jpg")
         with json_output_path.open("w", encoding="utf-8") as handler:
             json.dump(json_data, handler, indent=4, ensure_ascii=False)
 
@@ -58,7 +59,7 @@ class ArticleImageGenerator:
                                             height: int = 512,
                                             width: int = 512,
                                             steps: int = 20,
-                                            samples: int=1) -> Image.Image:
+                                            samples: int=1) -> List[Image.Image]:
         """Generates an image using the stability API.
             example prompt:
             [
@@ -88,9 +89,7 @@ class ArticleImageGenerator:
 
         if response.status_code != 200:
             raise BadPromptError(f"Stability unable to create image using prompt {prompt}: {response.text}.")
-
-        data = response.json()["artifacts"][0]
-        return self._base64_to_image(data['base64'])
+        return [self._base64_to_image(base64_img['base64']) for base64_img in response.json()["artifacts"]]
 
     @staticmethod
     def _base64_to_image(base64_string: str) -> Image.Image:
@@ -126,9 +125,9 @@ class ArticleImageGeneratorSummarization(ArticleImageGenerator):
         summmarized_text = self.text_processor.summarize_text(text)
         prompt: str = self.text_processor.text_to_tagged_prompt(summmarized_text, tags)
         prompt: List[Dict[str, float]] = [{"text": prompt, "weight": 1.0}] + NEGATIVE_PROMPT_KEYWORDS
-        image: Image.Image = self._prompt_to_image_with_stability_api(prompt,height=height, width=width, steps=steps, samples=samples)
-        self._save_output("Summarization",summmarized_text, image, prompt)
-        return {"pil_image": image, "prompt": prompt}
+        images: List[Image.Image] = self._prompt_to_image_with_stability_api(prompt,height=height, width=width, steps=steps, samples=samples)
+        self._save_output("Summarization",summmarized_text, images, prompt)
+        return {"pil_images": images, "prompt": prompt}
 
 
 class ArticleImageGeneratorKeywords(ArticleImageGenerator):

@@ -38,15 +38,17 @@ def text_to_image(main_funcion, text_and_look: TextToPromptRequest) -> JSONRespo
     steps = max(min(text_and_look.steps, 90), 20)  # Limit steps between 20 and 90
     samples = max(min(text_and_look.samples, 4), 1)  # Limit samples between 1 and 4
     output: Dict[str, Union[bytes, float, str]] = main_funcion(text_for_processing, IMAGE_STYLES[image_look], steps=steps, samples=samples)
-    image = output["pil_image"]
-    image_byte_arr = io.BytesIO()
-    image.save(image_byte_arr, format='JPEG')
-    image_bytes = image_byte_arr.getvalue()
-    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-
+    images = output["pil_images"] 
+    images_base64 = []
+    for image in images:
+        image_byte_arr = io.BytesIO()
+        image.save(image_byte_arr, format='JPEG')
+        image_bytes = image_byte_arr.getvalue()
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+        images_base64.append(image_base64)
     return JSONResponse(status_code=200, content={
         "prompt": output["prompt"],
-        "image_base64": image_base64
+        "images_base64": images_base64
     })
 
 @app.post("/backend/text-to-image/summarization", response_class=JSONResponse)
