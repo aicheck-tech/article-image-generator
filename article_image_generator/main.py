@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from article_image_generator.backend.pipeline import load_pipeline_from_keywords, load_pipeline_by_summarization
-from article_image_generator.settings import DEBUG, IMAGE_STYLES
+from article_image_generator.settings import DEBUG, IMAGE_STYLES, FASTAPI_HOST, FASTAPI_PORT, FASTAPI_WORKERS
 
 PATH = Path(__file__).parent/"public"
 
@@ -61,4 +61,4 @@ if __name__ == "__main__":
         filemode="w"
     )
     
-    uvicorn.run("article_image_generator.main:app", port=8001, workers=1)
+    uvicorn.run("article_image_generator.main:app", host=FASTAPI_HOST, port=FASTAPI_PORT, workers=FASTAPI_WORKERS)

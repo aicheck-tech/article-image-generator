@@ -2,11 +2,12 @@
 ## Table of contents
 
 - [Table of contents](#table-of-contents)
-    - [About:](#about)
-    - [Technologies:](#technologies)
-    - [AI Models:](#ai-models)
-    - [Requirements:](#requirements)
-- [Getting Started:](#getting-started)
+    - [About](#about)
+    - [Technologies](#technologies)
+    - [AI Models](#ai-models)
+    - [Requirements](#requirements)
+    - [Project preview](#project-preview)
+- [Getting Started](#getting-started)
 
 ## About
 Article image generator is a web application that generates headline images for articles. It's build on GPT-3.5, Stable diffusion 2.1 and our custom model for image validation. The application is built with Svelte and FastAPI.
@@ -16,12 +17,25 @@ Article image generator is a web application that generates headline images for 
 2. Backend: [FastAPI](https://fastapi.tiangolo.com/) – FastAPI is a powerful Python framework for building web applications.
 
 ### AI Models
-1. Image generation: [Stable diffusion 2.1](https://stability.ai/blog/stable-diffusion-public-release) – Stable diffusion 2.1 is an advanced AI model specifically designed for generating high-quality images
+1. Image generation: [Stable diffusion XL 2.2.2](https://stability.ai/blog/stable-diffusion-public-release) – Stable diffusion XL 2.2.2 is an advanced AI model specifically designed for generating high-quality images
 2. Text processing: [gpt-35-turbo](https://openai.com/blog/introducing-chatgpt-and-whisper-apis) – cutting-edge text processing model developed by OpenAI
 
 ### Requirements
 1. [Python 3.9.2](https://www.python.org/downloads/) – Python serves as the primary programming language for the backend implementation.
 2. [NodeJS 18.16.0 LTS](https://nodejs.org/en) – NodeJS is essential for running the Svelte frontend and managing the necessary dependencies.
+
+### Project preview
+
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin:1rem;">
+  <p>Application design</p>
+  <!-- FIXME: Replace for newer img -->
+  <img src="aig.png">
+</div>
+Example:
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin:1rem;">
+  <p>How Important Is Web3 and Decentralization to Industry Ecosystems?</p>
+  <img src="example.jpg">
+</div>
 
 ## Getting Started
 
@@ -66,6 +80,8 @@ python -m article_image_generator.main
 ```cmd
 python -m article_image_generator.main
 ```
+Optional
+5. In article_image_generator.settings you can change settings of all aspects of project
 
 ## scripts for testing
 ### javascript
@@ -113,3 +129,9 @@ $response = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -Body ($b
 
 $response
 ```
+
+Current style presets:
+- realistic
+- cinematic
+- cartoon
+- sketch
