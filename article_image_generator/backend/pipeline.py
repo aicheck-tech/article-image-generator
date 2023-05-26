@@ -159,7 +159,7 @@ class ArticleImageGeneratorKeywords(ArticleImageGenerator):
         prompt: List[Dict[str, float]] = [{"text": prompt, "weight": 1.0}] + NEGATIVE_PROMPT_KEYWORDS
         image: Image.Image = self._prompt_to_image_with_stability_api(prompt,height=height, width=width, steps=steps, samples=samples)
         self._save_output("Keywords", text, image, prompt)
-        return {"pil_image": image, "prompt": prompt, "keywords": keywords}
+        return {"pil_images": image, "prompt": prompt, "keywords": keywords}
 
 
 

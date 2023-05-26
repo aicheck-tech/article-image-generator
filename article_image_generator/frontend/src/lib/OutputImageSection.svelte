@@ -16,7 +16,7 @@
 <div class="output-image-section">
     <div class="image-container">
         {#each images as image}
-            {#if image}
+            {#if image.image_base64 !== undefined }
                 <img class="output-image" src={image.image_base64} alt="output" />
             {:else}
                 <div class="image-placeholder output-image"><LoaderIcon/></div>
@@ -28,7 +28,7 @@
         <div class="font-primary description-section">
             <p>ARTICLE:</p>
             {#if article}
-                <p class="color-text-lighter">{article}</p>
+                <p class="color-text-lighter article-text">{article}</p>
             {:else}
                 <p class="color-text-lighter placeholder">Lorem ipsum dolor sit amet...</p>
             {/if}
@@ -106,7 +106,14 @@
         justify-content: center;
         align-items: center;
 
-        width: 100%;
         height: 100%;
+        aspect-ratio: 1/1;
+    }
+
+    .article-text {
+        width: 10em;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 </style>

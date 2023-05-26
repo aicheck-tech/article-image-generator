@@ -9,11 +9,16 @@
 
     import design_services_icon from "@assets/icons/design_services_fill.png";
     import brush_icon from "@assets/icons/brush_fill.png";
+    import view_column_icon from "@assets/icons/view_column_fill.svg";
     import TitlePanel from "./lib/TitlePanel.svelte";
 
-    const tags = ["realistic", "cinematic", "cartoon", "sketch"];
+    const image_looks = ["realistic", "cinematic", "cartoon", "sketch"];
+    const processing_methods = ["Key-words", "Summarization"];
 
-    let image_look: string;
+    let current_image_look: string;
+    let current_processing_method: string;
+    let current_batch_size: string;
+
     let textarea_value: string = "";
     let output_of_generated_objects: Array<{
         images: Array<{
@@ -29,48 +34,89 @@
             images: [
                 {
                     image_base64: "https://picsum.photos/512/512",
-                    prompt: "Lorem ipsum ale jinde",
+                    prompt: "Example prompt",
                     processing_method: "Key words",
                     visual_look: "realistic",
-                    date: "2021-01-01",
-                }
+                    date: "2023-05-26"
+                },
+                {
+                    image_base64: "https://picsum.photos/530/530",
+                    prompt: "Example prompt",
+                    processing_method: "Key words",
+                    visual_look: "realistic",
+                    date: "2023-05-26"
+                },
+                {
+                    image_base64: "https://picsum.photos/500/500",
+                    prompt: "Example prompt",
+                    processing_method: "Key words",
+                    visual_look: "realistic",
+                    date: "2023-05-26"
+                },
+                {
+                    image_base64: "https://picsum.photos/520/520",
+                    prompt: "Example prompt",
+                    processing_method: "Key words",
+                    visual_look: "realistic",
+                    date: "2023-05-26"
+                },
             ],
-            article: "Lorem ipsum",
+            article: "Example article"
         },
     ];
 
     async function imagine(event) {
         event.target.disabled = true;
+        const current_time = (new Date()).toISOString().split('T')[0];
+
+        if (textarea_value.length < 3) {
+
+            event.target.children[0].innerHTML = "Text missing!";
+
+            setTimeout(() => {
+                event.target.children[0].innerHTML = "Imagine";
+                event.target.disabled = false;
+            }, 2000);
+
+            return;
+        }
+
+        const image_placeholder = {
+            image_base64: undefined,
+            prompt: undefined,
+            processing_method: current_processing_method,
+            visual_look: current_image_look,
+            date: current_time,
+        }
+        let image_placeholders = [];
+        for (let i = 0; i < parseInt(current_batch_size); i++) {
+            console.log(image_placeholder);
+            image_placeholders.push(image_placeholder);
+        }
 
         output_of_generated_objects.push({
-            images: [
-                {
-                    image_base64: "https://picsum.photos/512/512",
-                    prompt: "Lorem ipsum ale jinde",
-                    processing_method: "Key words",
-                    visual_look: "realistic",
-                    date: "2021-01-01",
-                }
-            ],
+            images: image_placeholders,
             article: textarea_value,
         });
         output_of_generated_objects = output_of_generated_objects;
 
-        textToImage(textarea_value, image_look).then((data) => {
-            console.log(data);
-        });
+        textToImage(
+            textarea_value, 
+            current_image_look, 
+            current_processing_method,
+            parseInt(current_batch_size)
+            ).then((data) => {
+                
+                console.log(data)
+                data.images_base64.forEach((image, idx) => {
+                    output_of_generated_objects[output_of_generated_objects.length - 1].images[idx].image_base64 = `data:image/png;base64,${image}`;
+                    output_of_generated_objects[output_of_generated_objects.length - 1].images[idx].prompt = data.prompts[0];
+                });
+                output_of_generated_objects = output_of_generated_objects;
 
-        // textToImage(textarea_value, image_look).then((data) => {
-        //     output_of_generated_objects[
-        //         output_of_generated_objects.length - 1
-        //     ].images[0].image_base64 = `data:image/png;base64,${data.image_base64}`;
-        //     output_of_generated_objects[
-        //         output_of_generated_objects.length - 1
-        //     ].images[0].prompt = data.prompt;
-        //     output_of_generated_objects = output_of_generated_objects;
-
-        //     event.target.disabled = false;
-        // });
+                event.target.disabled = false;
+            }
+        );
     }
 
     onMount(() => {
@@ -93,19 +139,25 @@
             <Dropdown
                 name="Processing method"
                 current_item_id={0}
-                items={["Key words", "Summarization"]}
+                items={processing_methods}
                 icon={design_services_icon}
-                input_type="checkbox"
+                bind:current_item={current_processing_method}
             />
             <Dropdown
                 name="Look"
                 current_item_id={0}
-                items={tags}
-                bind:current_item={image_look}
-
+                items={image_looks}
+                bind:current_item={current_image_look}
                 icon={brush_icon}
             />
-            <button on:click={imagine}>
+            <Dropdown
+                name="Number of images"
+                current_item_id={0}
+                items={["1", "2", "3", "4"]}
+                icon={view_column_icon}
+                bind:current_item={current_batch_size}
+            />
+            <button on:click={imagine} class="imagine-button">
                 <span class="invert">Imagine</span>
             </button>
         </section>
@@ -217,6 +269,11 @@
 
     .article-textarea::placeholder {
         color: var(--color-text-lighter);
+    }
+
+    .imagine-button {
+        position: sticky;
+        bottom: 0;
     }
 </style>
 

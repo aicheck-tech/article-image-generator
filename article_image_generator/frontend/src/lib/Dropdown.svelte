@@ -155,7 +155,7 @@
         height: 0.8em;
         margin-right: 0.25em;
 
-        border-radius: 0.25em;
+        border-radius: 50%;
 
         border: 2px solid var(--color-secondary);
 
