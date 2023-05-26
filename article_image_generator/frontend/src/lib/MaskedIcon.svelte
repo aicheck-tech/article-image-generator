@@ -23,11 +23,11 @@
 </script>
 
 {#if url}
-    <a class="mask" href="{url}" target="_blank" rel="noopener noreferrer">
+    <a class="mask" href="{url}" target="_blank" rel="">
         <img 
             src={icon} 
-            alt={alt} 
-            on:load={() => {maskSvg(icon, this.parent)}}
+            alt={alt}
+            on:load={(e) => {maskSvg(icon, e.target)}}
         />
     </a>
 {:else}

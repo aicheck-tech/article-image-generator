@@ -33,7 +33,7 @@
                 <p class="color-text-lighter placeholder">Lorem ipsum dolor sit amet...</p>
             {/if}
         </div>
-        <a class="font-primary description-section" href="/more_info">
+        <a class="font-primary description-section" href="/contact">
             <p>More info</p>
             <div class="arrow-more-info">
                 <MaskedIcon icon={arrow_icon} alt="More info" />

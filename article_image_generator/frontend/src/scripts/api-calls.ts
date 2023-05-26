@@ -29,7 +29,6 @@ export async function textToImage(
 
     const request_response = await fetch(request);
     const data = await request_response.json();
-    console.log(data);
     return {
         prompts: data.prompt,
         images_base64: data.images_base64,

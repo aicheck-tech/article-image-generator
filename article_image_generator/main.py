@@ -32,6 +32,10 @@ class TextToPromptRequest(BaseModel):
 def main():
     return PATH/"index.html"
 
+@app.get("/contact", response_class=FileResponse)
+def contact_page():
+    return PATH/"pages"/"contact.html"
+
 def text_to_image(main_funcion, text_and_look: TextToPromptRequest) -> JSONResponse:
     text_for_processing = text_and_look.text_for_processing[:2000] # Limit text to 2000 characters
     image_look = text_and_look.image_look
@@ -50,7 +54,7 @@ def text_to_image(main_funcion, text_and_look: TextToPromptRequest) -> JSONRespo
         image_bytes = image_byte_arr.getvalue()
         image_base64 = base64.b64encode(image_bytes).decode('utf-8')
         images_base64.append(image_base64)
-        logging.info(f"Image base64: {image_base64[:10]}...")
+        logging.info(f"Image base64: {image_base64[:50]}...")
     return JSONResponse(status_code=200, content={
         "prompt": output["prompt"],
         "images_base64": images_base64

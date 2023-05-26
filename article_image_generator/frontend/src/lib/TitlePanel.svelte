@@ -4,7 +4,7 @@
 </script>
 
 <section class="title-panel">
-    <h1>ARTIQ</h1>
+    <h1 class="font-primary">ARTIQ</h1>
     <a href="https://github.com/aicheck-tech/article-image-generator" target="_blank" class="icon-wrappers">
         <MaskedIcon icon={github_icon} alt="favicon" />
     </a>

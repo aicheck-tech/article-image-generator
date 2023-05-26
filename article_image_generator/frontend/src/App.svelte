@@ -90,7 +90,6 @@
         }
         let image_placeholders = [];
         for (let i = 0; i < parseInt(current_batch_size); i++) {
-            console.log(image_placeholder);
             image_placeholders.push(image_placeholder);
         }
 
@@ -106,11 +105,15 @@
             current_processing_method,
             parseInt(current_batch_size)
             ).then((data) => {
-                
-                console.log(data)
+                output_of_generated_objects[output_of_generated_objects.length - 1].images = [];
                 data.images_base64.forEach((image, idx) => {
-                    output_of_generated_objects[output_of_generated_objects.length - 1].images[idx].image_base64 = `data:image/png;base64,${image}`;
-                    output_of_generated_objects[output_of_generated_objects.length - 1].images[idx].prompt = data.prompts[0];
+                    output_of_generated_objects[output_of_generated_objects.length - 1].images.push({
+                        image_base64: `data:image/png;base64,${image}`,
+                        prompt: data.prompts[idx],
+                        processing_method: current_processing_method,
+                        visual_look: current_image_look,
+                        date: current_time,
+                    }) 
                 });
                 output_of_generated_objects = output_of_generated_objects;
 
@@ -216,8 +219,6 @@
         padding: 0.5em;
         padding-right: 0.25em;
         box-sizing: border-box;
-
-        /* border-right: 2px solid var(--color-secondary); */
     }
 
     .output-panel {
@@ -247,8 +248,8 @@
     }
 
     .article-textarea {
-        max-height: 70%;
-        min-height: 15em;
+        max-height: 30em;
+        min-height: 10em;
 
         resize: vertical;
 
