@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from article_image_generator.backend.pipeline import load_pipeline_from_keywords, load_pipeline_by_summarization
-from article_image_generator.settings import DEBUG, IMAGE_STYLES, FASTAPI_HOST, FASTAPI_PORT, FASTAPI_WORKERS
+from article_image_generator.settings import DEBUG, IMAGE_STYLES, FASTAPI_HOST, FASTAPI_PORT, FASTAPI_WORKERS, MAX_STEPS, MIN_STEPS, MAX_SAMPLES, MIN_SAMPLES
 
 PATH = Path(__file__).parent/"public"
 
@@ -35,8 +35,8 @@ def main():
 def text_to_image(main_funcion, text_and_look: TextToPromptRequest) -> JSONResponse:
     text_for_processing = text_and_look.text_for_processing[:2000] # Limit text to 2000 characters
     image_look = text_and_look.image_look
-    steps = max(min(text_and_look.steps, 90), 20)  # Limit steps between 20 and 90
-    samples = max(min(text_and_look.samples, 4), 1)  # Limit samples between 1 and 4
+    steps = max(min(text_and_look.steps, MAX_STEPS), MIN_STEPS)  # Limit steps between 20 and 90
+    samples = max(min(text_and_look.samples, MAX_SAMPLES), MIN_SAMPLES)  # Limit samples between 1 and 4
     output: Dict[str, Union[bytes, float, str]] = main_funcion(text_for_processing, IMAGE_STYLES[image_look], steps=steps, samples=samples)
     images = output["pil_images"] 
     images_base64 = []
