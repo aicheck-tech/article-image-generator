@@ -10,7 +10,7 @@
 - [Getting Started](#getting-started)
 
 ## About
-Article image generator is a web application that generates headline images for articles. It's build on GPT-3.5, Stable diffusion 2.1 and our custom model for image validation. The application is built with Svelte and FastAPI.
+Article image generator is a web application that generates headline images for articles. It's build on GPT-3.5, Stable diffusion XL 2.2.2 and our custom model for image validation. The application is built with Svelte and FastAPI.
 
 ### Technologies
 1. Frontend: [Svelte](https://svelte.dev/) – Svelte is a modern JavaScript framework that enables the development of interactive user interfaces
