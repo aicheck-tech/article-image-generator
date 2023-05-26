@@ -69,8 +69,8 @@ cd ../
 
 ```env
 OPENAI_API_KEY=<your key>
-OPENAI_API_ENGINE=gpt-35-turbo
-OPENAI_CUSTOM_DOMAIN=nextgen
+OPENAI_API_ENGINE=<your engine>
+OPENAI_CUSTOM_DOMAIN=<your domain>
 
 STABILITY_API_KEY=<your key>
 ```
@@ -84,6 +84,7 @@ cd ../
 python -m article_image_generator.main
 ```
 
+5. When first build is done, just run the python file
 5. When first build is done, just run the python file
     - don't forget to be in virtual enviroment
 

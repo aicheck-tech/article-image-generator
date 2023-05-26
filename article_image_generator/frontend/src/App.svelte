@@ -29,41 +29,7 @@
             date: string,
         }>,
         article: string
-    }> = [
-        {
-            images: [
-                {
-                    image_base64: "https://picsum.photos/512/512",
-                    prompt: "Example prompt",
-                    processing_method: "Key words",
-                    visual_look: "realistic",
-                    date: "2023-05-26"
-                },
-                {
-                    image_base64: "https://picsum.photos/530/530",
-                    prompt: "Example prompt",
-                    processing_method: "Key words",
-                    visual_look: "realistic",
-                    date: "2023-05-26"
-                },
-                {
-                    image_base64: "https://picsum.photos/500/500",
-                    prompt: "Example prompt",
-                    processing_method: "Key words",
-                    visual_look: "realistic",
-                    date: "2023-05-26"
-                },
-                {
-                    image_base64: "https://picsum.photos/520/520",
-                    prompt: "Example prompt",
-                    processing_method: "Key words",
-                    visual_look: "realistic",
-                    date: "2023-05-26"
-                },
-            ],
-            article: "Example article"
-        },
-    ];
+    }> = []
 
     async function imagine(event) {
         event.target.disabled = true;
@@ -105,6 +71,13 @@
             current_processing_method,
             parseInt(current_batch_size)
             ).then((data) => {
+                if (data.images_base64.length == 0) {
+                    output_of_generated_objects.pop();
+                    output_of_generated_objects = output_of_generated_objects;
+                    event.target.disabled = false;
+                    return;
+                }
+
                 output_of_generated_objects[output_of_generated_objects.length - 1].images = [];
                 data.images_base64.forEach((image, idx) => {
                     output_of_generated_objects[output_of_generated_objects.length - 1].images.push({
@@ -141,7 +114,7 @@
 
             <Dropdown
                 name="Processing method"
-                current_item_id={0}
+                current_item_id={1}
                 items={processing_methods}
                 icon={design_services_icon}
                 bind:current_item={current_processing_method}
