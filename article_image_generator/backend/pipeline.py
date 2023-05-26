@@ -125,7 +125,10 @@ class ArticleImageGeneratorSummarization(ArticleImageGenerator):
         summmarized_text = self.text_processor.summarize_text(text)
         prompt: str = self.text_processor.text_to_tagged_prompt(summmarized_text, tags)
         prompt: List[Dict[str, float]] = [{"text": prompt, "weight": 1.0}] + NEGATIVE_PROMPT_KEYWORDS
-        images: List[Image.Image] = self._prompt_to_image_with_stability_api(prompt,height=height, width=width, steps=steps, samples=samples)
+        try:
+            images: List[Image.Image] = self._prompt_to_image_with_stability_api(prompt,height=height, width=width, steps=steps, samples=samples)
+        except BadPromptError as e:
+            return {"error": str(e)}
         self._save_output("Summarization",summmarized_text, images, prompt)
         return {"pil_images": images, "prompt": prompt}
 
@@ -157,9 +160,12 @@ class ArticleImageGeneratorKeywords(ArticleImageGenerator):
         keywords = keywords[:round(len(keywords)*self.PERCENTAGE_OF_KEYWORDS)]
         prompt: str = self.text_processor.keywords_to_prompt(keywords, tags)
         prompt: List[Dict[str, float]] = [{"text": prompt, "weight": 1.0}] + NEGATIVE_PROMPT_KEYWORDS
-        image: Image.Image = self._prompt_to_image_with_stability_api(prompt,height=height, width=width, steps=steps, samples=samples)
-        self._save_output("Keywords", text, image, prompt)
-        return {"pil_image": image, "prompt": prompt, "keywords": keywords}
+        try:
+            images: List[Image.Image] = self._prompt_to_image_with_stability_api(prompt,height=height, width=width, steps=steps, samples=samples)
+        except BadPromptError as e:
+            return {"error": str(e)}
+        self._save_output("Keywords", text, images, prompt)
+        return {"pil_images": images, "prompt": prompt, "keywords": keywords}
 
 
 
