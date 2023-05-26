@@ -85,6 +85,7 @@ python -m article_image_generator.main
 ```
 
 5. When first build is done, just run the python file
+5. When first build is done, just run the python file
     - don't forget to be in virtual enviroment
 
 ```cmd
