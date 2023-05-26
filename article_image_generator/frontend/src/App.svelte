@@ -9,8 +9,7 @@
 
     import design_services_icon from "@assets/icons/design_services_fill.png";
     import brush_icon from "@assets/icons/brush_fill.png";
-    import github_icon from "@assets/icons/github-mark.svg";
-    import MaskedIcon from "./lib/MaskedIcon.svelte";
+    import TitlePanel from "./lib/TitlePanel.svelte";
 
     const tags = ["realistic", "cinematic", "cartoon", "sketch"];
 
@@ -81,12 +80,7 @@
 </script>
 
 <main>
-    <section class="title-panel">
-        <h1>ARTIQ</h1>
-        <a href="https://github.com/aicheck-tech/article-image-generator" target="_blank" class="icon-wrapper">
-            <MaskedIcon icon={github_icon} alt="favicon" />
-        </a>
-    </section>
+    <TitlePanel />
 
     <div class="body-wrapper">
         <section class="input-panel">
@@ -126,8 +120,12 @@
         </output>
 
         <section class="info-panel">
-            <h2 class="font-primary">Info</h2>
-            <p class="font-secondary-regular color-text-lighter">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sit suscipit provident tenetur accusantium esse dolores sunt earum. Doloribus, consequuntur ipsa!</p>
+            <h2 class="font-primary">How this works</h2>
+            <ul class="font-secondary-regular color-text-lighter">
+                <li>Enter your article</li>
+                <li>Our advanced algorithms analyze your text</li>
+                <li>Sit back and watch as the generator selects relevant images to perfectly complement your content</li>
+            </ul>
         </section>
     </div>
 </main>
@@ -141,22 +139,6 @@
 
         display: flex;
         flex-direction: column;
-    }
-
-    h1 {
-        margin: 0;
-    }
-
-    .title-panel {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        padding: 0.5em;
-        padding-bottom: 0;
-        height: 4rem;
-
-        border-bottom: 2px solid var(--color-secondary);
     }
 
     .body-wrapper {
@@ -198,6 +180,18 @@
         flex: calc(1 / 4);
 
         width: 100%;
+
+        display: flex;
+        flex-direction: column;
+
+        padding: 0.5em;
+    }
+
+    .info-panel > ul {
+        margin: 0;
+        padding: 0;
+        
+        padding-left: 1em;
     }
 
     .article-textarea {

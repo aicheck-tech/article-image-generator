@@ -1,5 +1,5 @@
 <section class="contact-wrapper">
-    <a class="font-primary">contact</a>
+    <a class="font-primary" href="/contact">contact</a>
     <a href="http://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" class="font-primary license-link">
         License
         <div class="license-icons">
