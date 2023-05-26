@@ -1,30 +1,125 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    
+
     import favicon from "@assets/favicon.ico";
     import Dropdown from "@lib/Dropdown.svelte";
     import OutputImageSection from "@lib/OutputImageSection.svelte";
-    import { textToImage } from "@scripts/api-calls"
+    import ContactSection from "@lib/ContactSection.svelte";
+    import { textToImage } from "@scripts/api-calls";
 
-    const tags = ["realistic", "cinematic", "cartoon", "sketch"];
+    import design_services_icon from "@assets/icons/design_services_fill.png";
+    import brush_icon from "@assets/icons/brush_fill.png";
+    import view_column_icon from "@assets/icons/view_column_fill.svg";
+    import TitlePanel from "./lib/TitlePanel.svelte";
 
-    let image_look: string;
+    const image_looks = ["realistic", "cinematic", "cartoon", "sketch"];
+    const processing_methods = ["Key-words", "Summarization"];
+
+    let current_image_look: string;
+    let current_processing_method: string;
+    let current_batch_size: string;
+
     let textarea_value: string = "";
-    let output_of_generated_objects: Array<{image: string, article: string, prompt: string}> = [];
+    let output_of_generated_objects: Array<{
+        images: Array<{
+            image_base64: string,
+            prompt: string,
+            processing_method: string,
+            visual_look: string,
+            date: string,
+        }>,
+        article: string
+    }> = [
+        {
+            images: [
+                {
+                    image_base64: "https://picsum.photos/512/512",
+                    prompt: "Example prompt",
+                    processing_method: "Key words",
+                    visual_look: "realistic",
+                    date: "2023-05-26"
+                },
+                {
+                    image_base64: "https://picsum.photos/530/530",
+                    prompt: "Example prompt",
+                    processing_method: "Key words",
+                    visual_look: "realistic",
+                    date: "2023-05-26"
+                },
+                {
+                    image_base64: "https://picsum.photos/500/500",
+                    prompt: "Example prompt",
+                    processing_method: "Key words",
+                    visual_look: "realistic",
+                    date: "2023-05-26"
+                },
+                {
+                    image_base64: "https://picsum.photos/520/520",
+                    prompt: "Example prompt",
+                    processing_method: "Key words",
+                    visual_look: "realistic",
+                    date: "2023-05-26"
+                },
+            ],
+            article: "Example article"
+        },
+    ];
 
-    async function imagine() {
+    async function imagine(event) {
+        event.target.disabled = true;
+        const current_time = (new Date()).toISOString().split('T')[0];
+
+        if (textarea_value.length < 3) {
+
+            event.target.children[0].innerHTML = "Text missing!";
+
+            setTimeout(() => {
+                event.target.children[0].innerHTML = "Imagine";
+                event.target.disabled = false;
+            }, 2000);
+
+            return;
+        }
+
+        const image_placeholder = {
+            image_base64: undefined,
+            prompt: undefined,
+            processing_method: current_processing_method,
+            visual_look: current_image_look,
+            date: current_time,
+        }
+        let image_placeholders = [];
+        for (let i = 0; i < parseInt(current_batch_size); i++) {
+            image_placeholders.push(image_placeholder);
+        }
+
         output_of_generated_objects.push({
-            image: undefined,
+            images: image_placeholders,
             article: textarea_value,
-            prompt: undefined
         });
         output_of_generated_objects = output_of_generated_objects;
 
-        textToImage(textarea_value, image_look).then((data) => {
-            output_of_generated_objects[output_of_generated_objects.length - 1].image = `data:image/png;base64,${data.image_base64}`;
-            output_of_generated_objects[output_of_generated_objects.length - 1].prompt = data.prompt;
-            output_of_generated_objects = output_of_generated_objects;
-        });
+        textToImage(
+            textarea_value, 
+            current_image_look, 
+            current_processing_method,
+            parseInt(current_batch_size)
+            ).then((data) => {
+                output_of_generated_objects[output_of_generated_objects.length - 1].images = [];
+                data.images_base64.forEach((image, idx) => {
+                    output_of_generated_objects[output_of_generated_objects.length - 1].images.push({
+                        image_base64: `data:image/png;base64,${image}`,
+                        prompt: data.prompts[idx],
+                        processing_method: current_processing_method,
+                        visual_look: current_image_look,
+                        date: current_time,
+                    }) 
+                });
+                output_of_generated_objects = output_of_generated_objects;
+
+                event.target.disabled = false;
+            }
+        );
     }
 
     onMount(() => {
@@ -34,151 +129,152 @@
 </script>
 
 <main>
-    <section class="title-panel">
-        <h1>Article image generator</h1>
-        <h2>Generate images for articles</h2>
-    </section>
+    <TitlePanel />
 
-    <section class="input-panel">
-        <textarea bind:value={textarea_value} class="article-textarea group" placeholder="Insert you article here..." />
-        
-        <section class="group input-panel-settings">
-            <Dropdown 
-                name="Type" 
-                border_radius={["top-left", "top-right"]} 
-                current_item_id={0} 
-                items={["summarization", "key words"]} 
+    <div class="body-wrapper">
+        <section class="input-panel">
+            <textarea
+                bind:value={textarea_value}
+                class="article-textarea font-secondary-regular"
+                placeholder="Insert you article here..."
             />
-            <Dropdown 
-                name="Look" 
-                border_radius={[]} 
-                current_item_id={0} 
-                items={tags}
-                bind:current_item={image_look} 
+
+            <Dropdown
+                name="Processing method"
+                current_item_id={0}
+                items={processing_methods}
+                icon={design_services_icon}
+                bind:current_item={current_processing_method}
             />
-            <button on:click={imagine} style="border-radius: 0 0 var(--border-radius) var(--border-radius)">Imagine</button>
+            <Dropdown
+                name="Look"
+                current_item_id={0}
+                items={image_looks}
+                bind:current_item={current_image_look}
+                icon={brush_icon}
+            />
+            <Dropdown
+                name="Number of images"
+                current_item_id={0}
+                items={["1", "2", "3", "4"]}
+                icon={view_column_icon}
+                bind:current_item={current_batch_size}
+            />
+            <button on:click={imagine} class="imagine-button">
+                <span class="invert">Imagine</span>
+            </button>
         </section>
-    </section>
 
-    <output class="output-panel">
-        {#each output_of_generated_objects.slice().reverse() as output }
-            <OutputImageSection image={output.image} article={output.article} prompt={output.prompt} />
-        {/each}
-    </output>
+        <output class="output-panel">
+            {#each output_of_generated_objects.slice().reverse() as output}
+                <OutputImageSection
+                    images={output.images}
+                    article={output.article}
+                />
+            {/each}
+        </output>
+
+        <section class="info-panel">
+            <h2 class="font-primary">How this works</h2>
+            <ul class="font-secondary-regular color-text-lighter">
+                <li>Enter your article</li>
+                <li>Our advanced algorithms analyze your text</li>
+                <li>Sit back and watch as the generator selects relevant images to perfectly complement your content</li>
+            </ul>
+        </section>
+    </div>
 </main>
+
+<ContactSection />
 
 <style>
     main {
-        display: grid;
-        grid-template-rows: fit-content(1ch) 1fr;
-        grid-template-columns: fit-content(1ch) 1fr;
-
-        width: 100vw;
-        height: 100vh;
-
-        background: rgb(var(--color-primary));
-    }
-
-    button {
-        border-radius: 0;
         width: 100%;
-    }
-
-    .title-panel {
-        grid-row: 1;
-        grid-column: 1 / 3;
-
-        padding-top: 0.5em;
-        padding-bottom: 1.4em;
-
-        width: 100%;
-        height: fit-content;
+        height: 100%;
 
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+    }
 
-        background: rgb(var(--color-secondary));
+    .body-wrapper {
+        display: flex;
+        flex-direction: row;
 
-        border-bottom: 2px solid rgb(var(--color-tertiary));
+        height: 100%;
 
-        text-align: left;
+        overflow-y: auto;
     }
 
     .input-panel {
-        grid-row: 2;
-        grid-column: 1;
+        width: 100%;
+
+        flex: calc(1 / 4);
+        min-width: 20em;
+
+        overflow-y: scroll;
 
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
-        gap: -0.5em;
 
-        width: fit-content;
-        height:100%;
-
-        box-sizing: border-box;
-
-        border-right: 2px solid rgb(var(--color-tertiary));
-    }
-
-    .group {
-        box-sizing: border-box;
-    }
-
-    .article-textarea {
-        resize: both;
-        overflow: auto;
-
-        width: 15rem;
-        min-width: 12rem;
-        max-width: 25rem;
-
-        height: 50%;
-        min-height: 12rem;
-        max-height: 65vh;
-
-        margin: 0.5em;
         padding: 0.5em;
-
-        background: rgb(var(--color-secondary));
-
-        border: 1px solid rgb(var(--color-tertiary));
-        border-radius: var(--border-radius);
-    }
-
-    .article-textarea::placeholder {
-        color: rgba(var(--color-text), 0.5);
-
-        font-family: 'Roboto Mono', monospace;
-        font-weight: 300;
-        font-size: 0.9em;
-    }
-
-    .article-textarea:focus {
-        border: 2px solid rgba(var(--color-text), 0.4);
-        outline: none;
-    }
-
-    .input-panel-settings {
-        display: flex;
-        flex-direction: column;
-        
-        justify-content: space-between;
-
-        margin: 0.5em;
+        padding-right: 0.25em;
+        box-sizing: border-box;
     }
 
     .output-panel {
-        grid-row: 2;
-        grid-column: 2;
+        width: 100%;
 
-        background: rgb(var(--color-primary));
+        flex: calc(1 / 2);
+
+        overflow-y: scroll;
+    }
+
+    .info-panel {
+        flex: calc(1 / 4);
+
+        width: 100%;
 
         display: flex;
         flex-direction: column;
 
-        box-sizing: border-box;
-        overflow-y: scroll;
+        padding: 0.5em;
+    }
+
+    .info-panel > ul {
+        margin: 0;
+        padding: 0;
+        
+        padding-left: 1em;
+    }
+
+    .article-textarea {
+        max-height: 30em;
+        min-height: 10em;
+
+        resize: vertical;
+
+        background: var(--color-primary);
+        border: 2px solid var(--color-secondary);
+        border-radius: var(--border-radius);
+
+        padding: 0.5em;
+
+        font-size: 1em;
+
+        color: var(--color-text);
+    }
+
+    .article-textarea:focus {
+        outline: none;
+    }
+
+    .article-textarea::placeholder {
+        color: var(--color-text-lighter);
+    }
+
+    .imagine-button {
+        position: sticky;
+        bottom: 0;
     }
 </style>
+

@@ -65,7 +65,17 @@ npm install
 cd ../
 ```
 
-3. Build svelte and run fastapi
+3. Create .env file and fill it with your API keys
+
+```env
+OPENAI_API_KEY=<your key>
+OPENAI_API_ENGINE=gpt-35-turbo
+OPENAI_CUSTOM_DOMAIN=nextgen
+
+STABILITY_API_KEY=<your key>
+```
+
+4. Build svelte and run fastapi
 
 ```cmd
 cd ./frontend
@@ -74,7 +84,7 @@ cd ../
 python -m article_image_generator.main
 ```
 
-4. When first build is done, just run the python file
+5. When first build is done, just run the python file
     - don't forget to be in virtual enviroment
 
 ```cmd
@@ -83,52 +93,6 @@ python -m article_image_generator.main
 Optional
 5. In article_image_generator.settings you can change settings of all aspects of project
 
-## scripts for testing
-### javascript
-```js
-const obj = { 
-    text_for_processing: "Yellow submarine with a red hat",
-    image_look: "realistic"
-};
-
-const request = new Request("/backend/text-to-image", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify(obj),
-});
-
-fetch(request).then((data) => {
-  console.log(data.json());
-});
-```
-
-### Curl:
-```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "text_for_processing": "Yellow submarine with a red hat",
-  "image_look": "realistic"
-}' http://127.0.0.1:8001/backend/text-to-image
-```
-
-### Powershell:
-```powershell
-$uri = "http://127.0.0.1:8001/backend/text-to-image"
-
-$headers = @{
-    "Content-Type" = "application/json"
-}
-
-$body = @{
-    "text_for_processing" = "Yellow submarine with a red hat"
-    "image_look" = "realistic"
-}
-
-$response = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -Body ($body | ConvertTo-Json)
-
-$response
-```
 
 Current style presets:
 - realistic

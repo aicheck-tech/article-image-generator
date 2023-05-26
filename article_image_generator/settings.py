@@ -42,6 +42,8 @@ OPENAI_TEXT_TO_PROMPT_SYSTEM_TEXT = (
     "'prompt': 'SaaSPath 2023 is a list of various application categories including Banner Books, CPQ, Digital Commerce, Employee Experience, Facility Management, Field Service Management, PIM/PXM, and Procurement. It also includes information on adoption, deployment models, budget plans, replacement cycle timing, purchasing preferences, and attitudes towards SaaS buying channels. The report provides insights on packaging, pricing options, vendor reviews, ratings, spend, and advocacy scores for functional application markets.'\n\n"
     "If it's for paper or a study, generate prompt for some real physical object, that the study is about.\n\n"
     "the text must be short and to the point\n"
+    "Annotate it as:\n"
+    "'prompt': <prompt>"
 )
 
 
