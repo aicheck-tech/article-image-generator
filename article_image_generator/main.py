@@ -12,43 +12,52 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from article_image_generator.backend.pipeline import load_pipeline_from_keywords, load_pipeline_by_summarization
-from article_image_generator.settings import DEBUG, IMAGE_STYLES, FASTAPI_HOST, FASTAPI_PORT, FASTAPI_WORKERS
+from article_image_generator.settings import DEBUG, IMAGE_STYLES, FASTAPI_HOST, FASTAPI_PORT, FASTAPI_WORKERS, MAX_STEPS, MIN_STEPS, MAX_SAMPLES, MIN_SAMPLES
 
 PATH = Path(__file__).parent/"public"
 
 app = FastAPI()
 app.mount("/assets", StaticFiles(directory=PATH/"assets"), name="static")
 
-class TextToImageRequest(BaseModel):
+aig_keywords = load_pipeline_from_keywords()
+aig_summarization = load_pipeline_by_summarization()
+class TextToPromptRequest(BaseModel):
     text_for_processing: str
     image_look: Literal["realistic", "cinematic", "cartoon", "sketch"]
+    steps: int = 30
+    samples: int = 1
 
 
 @app.get("/", response_class=FileResponse)
 def main():
     return PATH/"index.html"
 
-
-@app.post("/backend/text-to-image", response_class=JSONResponse)
-def text_to_image_response(
-                        text_and_look: TextToImageRequest
-                        ) -> JSONResponse:
-    text_for_processing = text_and_look.text_for_processing
+def text_to_image(main_funcion, text_and_look: TextToPromptRequest) -> JSONResponse:
+    text_for_processing = text_and_look.text_for_processing[:2000] # Limit text to 2000 characters
     image_look = text_and_look.image_look
-        
-    article_image_generator = load_pipeline_by_summarization()
-    output: Dict[str, Union[bytes, float, str]] = article_image_generator.main(text_for_processing, IMAGE_STYLES[image_look])
-
-    image = output["pil_image"]
-    image_byte_arr = io.BytesIO()
-    image.save(image_byte_arr, format='JPEG')
-    image_bytes = image_byte_arr.getvalue()
-    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-
+    steps = max(min(text_and_look.steps, MAX_STEPS), MIN_STEPS)  # Limit steps between 20 and 90
+    samples = max(min(text_and_look.samples, MAX_SAMPLES), MIN_SAMPLES)  # Limit samples between 1 and 4
+    output: Dict[str, Union[bytes, float, str]] = main_funcion(text_for_processing, IMAGE_STYLES[image_look], steps=steps, samples=samples)
+    images = output["pil_images"] 
+    images_base64 = []
+    for image in images:
+        image_byte_arr = io.BytesIO()
+        image.save(image_byte_arr, format='JPEG')
+        image_bytes = image_byte_arr.getvalue()
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+        images_base64.append(image_base64)
     return JSONResponse(status_code=200, content={
         "prompt": output["prompt"],
-        "image_base64": image_base64
+        "images_base64": images_base64
     })
+
+@app.post("/backend/text-to-image/summarization", response_class=JSONResponse)
+def text_to_image_response_summarization(text_and_look: TextToPromptRequest) -> JSONResponse:
+    return text_to_image(aig_summarization.main, text_and_look)
+
+@app.post("/backend/text-to-image/keywords", response_class=JSONResponse)
+def text_to_image_response_keywords(text_and_look: TextToPromptRequest) -> JSONResponse:
+    return text_to_image(aig_keywords.main, text_and_look)
 
 
 if __name__ == "__main__":
