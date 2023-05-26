@@ -28,6 +28,14 @@ export async function textToImage(
     });
 
     const request_response = await fetch(request);
+
+    if (request_response.status !== 200) {
+        return {
+            prompts: ["Error"],
+            images_base64: [],
+        }
+    }
+
     const data = await request_response.json();
     return {
         prompts: data.prompt,

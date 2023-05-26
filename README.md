@@ -69,8 +69,8 @@ cd ../
 
 ```env
 OPENAI_API_KEY=<your key>
-OPENAI_API_ENGINE=gpt-35-turbo
-OPENAI_CUSTOM_DOMAIN=nextgen
+OPENAI_API_ENGINE=<your engine>
+OPENAI_CUSTOM_DOMAIN=<your domain>
 
 STABILITY_API_KEY=<your key>
 ```
