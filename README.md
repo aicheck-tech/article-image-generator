@@ -73,8 +73,6 @@ OPENAI_API_ENGINE=gpt-35-turbo
 OPENAI_CUSTOM_DOMAIN=nextgen
 
 STABILITY_API_KEY=<your key>
-
-HG-Dzeniks_ACCESS_TOKEN=<your key>
 ```
 
 4. Build svelte and run fastapi
