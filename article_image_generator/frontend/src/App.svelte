@@ -4,24 +4,39 @@
     import favicon from "@assets/favicon.ico";
     import Dropdown from "@lib/Dropdown.svelte";
     import OutputImageSection from "@lib/OutputImageSection.svelte";
+    import ContactSection from "@lib/ContactSection.svelte";
     import { textToImage } from "@scripts/api-calls";
 
-    import design_services_icon from "@assets/icons/design_services_fill.png"
-    import brush_icon from "@assets/icons/brush_fill.png"
+    import design_services_icon from "@assets/icons/design_services_fill.png";
+    import brush_icon from "@assets/icons/brush_fill.png";
+    import github_icon from "@assets/icons/github-mark.svg";
+    import MaskedIcon from "./lib/MaskedIcon.svelte";
 
     const tags = ["realistic", "cinematic", "cartoon", "sketch"];
 
     let image_look: string;
     let textarea_value: string = "";
     let output_of_generated_objects: Array<{
-        image: string;
-        article: string;
-        prompt: string;
+        images: Array<{
+            image_base64: string,
+            prompt: string,
+            processing_method: string,
+            visual_look: string,
+            date: string,
+        }>,
+        article: string
     }> = [
         {
-            image: "https://picsum.photos/512/512",
+            images: [
+                {
+                    image_base64: "https://picsum.photos/512/512",
+                    prompt: "Lorem ipsum ale jinde",
+                    processing_method: "Key words",
+                    visual_look: "realistic",
+                    date: "2021-01-01",
+                }
+            ],
             article: "Lorem ipsum",
-            prompt: "Lorem ipsum ale jinde",
         },
     ];
 
@@ -29,23 +44,34 @@
         event.target.disabled = true;
 
         output_of_generated_objects.push({
-            image: undefined,
+            images: [
+                {
+                    image_base64: "https://picsum.photos/512/512",
+                    prompt: "Lorem ipsum ale jinde",
+                    processing_method: "Key words",
+                    visual_look: "realistic",
+                    date: "2021-01-01",
+                }
+            ],
             article: textarea_value,
-            prompt: undefined,
         });
         output_of_generated_objects = output_of_generated_objects;
 
         textToImage(textarea_value, image_look).then((data) => {
-            output_of_generated_objects[
-                output_of_generated_objects.length - 1
-            ].image = `data:image/png;base64,${data.image_base64}`;
-            output_of_generated_objects[
-                output_of_generated_objects.length - 1
-            ].prompt = data.prompt;
-            output_of_generated_objects = output_of_generated_objects;
-
-            event.target.disabled = false;
+            console.log(data);
         });
+
+        // textToImage(textarea_value, image_look).then((data) => {
+        //     output_of_generated_objects[
+        //         output_of_generated_objects.length - 1
+        //     ].images[0].image_base64 = `data:image/png;base64,${data.image_base64}`;
+        //     output_of_generated_objects[
+        //         output_of_generated_objects.length - 1
+        //     ].images[0].prompt = data.prompt;
+        //     output_of_generated_objects = output_of_generated_objects;
+
+        //     event.target.disabled = false;
+        // });
     }
 
     onMount(() => {
@@ -56,172 +82,147 @@
 
 <main>
     <section class="title-panel">
-        <h1 class="invert">Article image generator</h1>
-        <h2 class="invert">Generate images for articles</h2>
+        <h1>ARTIQ</h1>
+        <a href="https://github.com/aicheck-tech/article-image-generator" target="_blank" class="icon-wrapper">
+            <MaskedIcon icon={github_icon} alt="favicon" />
+        </a>
     </section>
 
-    <section class="input-panel">
-        <textarea
-            bind:value={textarea_value}
-            class="article-textarea group"
-            placeholder="Insert you article here..."
-        />
+    <div class="body-wrapper">
+        <section class="input-panel">
+            <textarea
+                bind:value={textarea_value}
+                class="article-textarea font-secondary-regular"
+                placeholder="Insert you article here..."
+            />
 
-        <section class="group input-panel-settings">
             <Dropdown
                 name="Processing method"
-                border_radius={["top-left", "top-right"]}
                 current_item_id={0}
-                items={["summarization", "key words"]}
+                items={["Key words", "Summarization"]}
                 icon={design_services_icon}
+                input_type="checkbox"
             />
             <Dropdown
                 name="Look"
-                border_radius={[]}
                 current_item_id={0}
                 items={tags}
                 bind:current_item={image_look}
 
                 icon={brush_icon}
             />
-            <button
-                on:click={imagine}
-                style="border-radius: 0 0 var(--border-radius) var(--border-radius)"
-            >
+            <button on:click={imagine}>
                 <span class="invert">Imagine</span>
             </button>
         </section>
-    </section>
 
-    <output class="output-panel">
-        {#each output_of_generated_objects.slice().reverse() as output}
-            <OutputImageSection
-                image={output.image}
-                article={output.article}
-                prompt={output.prompt}
-            />
-        {/each}
-    </output>
+        <output class="output-panel">
+            {#each output_of_generated_objects.slice().reverse() as output}
+                <OutputImageSection
+                    images={output.images}
+                    article={output.article}
+                />
+            {/each}
+        </output>
+
+        <section class="info-panel">
+            <h2 class="font-primary">Info</h2>
+            <p class="font-secondary-regular color-text-lighter">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sit suscipit provident tenetur accusantium esse dolores sunt earum. Doloribus, consequuntur ipsa!</p>
+        </section>
+    </div>
 </main>
+
+<ContactSection />
 
 <style>
     main {
-        display: grid;
-        grid-template-rows: fit-content(1ch) 1fr;
-        grid-template-columns: fit-content(1ch) 1fr;
+        width: 100%;
+        height: 100%;
 
-        width: 100vw;
-        height: 100vh;
-
-        background: var(--color-primary);
+        display: flex;
+        flex-direction: column;
     }
 
-    button {
-        border-radius: 0;
-        width: 100%;
+    h1 {
+        margin: 0;
     }
 
     .title-panel {
-        grid-row: 1;
-        grid-column: 1 / 3;
-
-        padding-top: 0.5em;
-        padding-bottom: 1.4em;
-
-        width: 100%;
-        height: fit-content;
-
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+        justify-content: space-between;
+        align-items: center;
 
-        background: var(--color-secondary);
+        padding: 0.5em;
+        padding-bottom: 0;
+        height: 4rem;
 
-        border-bottom: 2px solid var(--color-tertiary);
-
-        text-align: left;
+        border-bottom: 2px solid var(--color-secondary);
     }
 
-    .invert {
-        filter: invert(1);
+    .body-wrapper {
+        display: flex;
+        flex-direction: row;
+
+        height: 100%;
+
+        overflow-y: auto;
     }
 
     .input-panel {
-        grid-row: 2;
-        grid-column: 1;
+        width: 100%;
+
+        flex: calc(1 / 4);
+        min-width: 20em;
+
+        overflow-y: scroll;
 
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
-        gap: -0.5em;
 
-        width: fit-content;
-        height: 100%;
-
-        box-sizing: border-box;
-
-        border-right: 2px solid var(--color-tertiary);
-    }
-
-    .group {
-        box-sizing: border-box;
-    }
-
-    .article-textarea {
-        resize: both;
-        overflow: auto;
-
-        width: 15rem;
-        min-width: 12rem;
-        max-width: 25rem;
-
-        height: 50%;
-        min-height: 12rem;
-        max-height: 65vh;
-
-        margin: 0.5em;
         padding: 0.5em;
+        padding-right: 0.25em;
+        box-sizing: border-box;
 
-        background: var(--color-tertiary);
-
-        border: 1px solid var(--color-tertiary);
-        border-radius: var(--border-radius);
-
-        color: var(--color-text);
-    }
-
-    .article-textarea::placeholder {
-        color: var(--color-text);
-
-        font-family: "Roboto Mono", monospace;
-        font-weight: 300;
-        font-size: 1em;
-    }
-
-    .article-textarea:focus {
-        border: 2px solid var(--color-text);
-        outline: none;
-    }
-
-    .input-panel-settings {
-        display: flex;
-        flex-direction: column;
-
-        justify-content: space-between;
-
-        margin: 0.5em;
+        /* border-right: 2px solid var(--color-secondary); */
     }
 
     .output-panel {
-        grid-row: 2;
-        grid-column: 2;
+        width: 100%;
 
-        background: var(--color-primary);
+        flex: calc(1 / 2);
 
-        display: flex;
-        flex-direction: column;
-
-        box-sizing: border-box;
         overflow-y: scroll;
     }
+
+    .info-panel {
+        flex: calc(1 / 4);
+
+        width: 100%;
+    }
+
+    .article-textarea {
+        max-height: 70%;
+        min-height: 15em;
+
+        resize: vertical;
+
+        background: var(--color-primary);
+        border: 2px solid var(--color-secondary);
+        border-radius: var(--border-radius);
+
+        padding: 0.5em;
+
+        font-size: 1em;
+
+        color: var(--color-text);
+    }
+
+    .article-textarea:focus {
+        outline: none;
+    }
+
+    .article-textarea::placeholder {
+        color: var(--color-text-lighter);
+    }
 </style>
+

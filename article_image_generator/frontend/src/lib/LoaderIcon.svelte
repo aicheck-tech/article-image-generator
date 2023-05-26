@@ -15,7 +15,7 @@
         width: 13px;
         height: 13px;
         border-radius: 50%;
-        background: var(--color-text);
+        background: var(--color-text-lighter);
         animation-timing-function: var(--loader-animation-timing);
     }
 

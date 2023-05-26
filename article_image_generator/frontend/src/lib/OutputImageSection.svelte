@@ -1,144 +1,112 @@
 <script lang="ts">
     import LoaderIcon from "@lib/LoaderIcon.svelte";
+    import arrow_icon from "@assets/icons/arrow.svg";
+    import MaskedIcon from "./MaskedIcon.svelte";
 
-    export let image = undefined;
+    export let images: Array<{
+            image_base64: string,
+            prompt: string,
+            processing_method: string,
+            visual_look: string,
+            date: string,
+        }> = undefined;
     export let article = undefined;
-    export let prompt = undefined;
 </script>
 
 <div class="output-image-section">
-    <span class="output-prompt">
-        <h3>Article: </h3>
-        {#if article}
-            <span>{article}</span>
-        {:else}
-            <span class="placeholder">
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Asperiores, reiciendis aliquid mollitia quia, ducimus iste voluptas inventore vero ipsam accusamus iure incidunt ullam numquam sequi. Odio ipsam iusto voluptate molestias optio. Necessitatibus, natus temporibus. Placeat consequuntur vitae ullam libero, quidem enim ipsa assumenda accusantium doloremque quibusdam odio.
-            </span>
-        {/if}
+    <div class="image-container">
+        {#each images as image}
+            {#if image}
+                <img class="output-image" src={image.image_base64} alt="output" />
+            {:else}
+                <div class="image-placeholder output-image"><LoaderIcon/></div>
+            {/if}
+        {/each}
+    </div>
 
-        <h3>Prompt: </h3>
-        {#if prompt}
-            <span>{prompt}</span>
-        {:else}
-            <span class="placeholder">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit repellat consequuntur dolore esse molestiae quia necessitatibus, deserunt harum repellendus quod.
-            </span>
-        {/if}
-    </span>
-    {#if image}
-        <img class="output-image" src={image} alt="output" />
-    {:else}
-        <div class="image-placeholder output-image"><LoaderIcon/></div>
-    {/if}
-
+    <div class="description-container">
+        <div class="font-primary description-section">
+            <p>ARTICLE:</p>
+            {#if article}
+                <p class="color-text-lighter">{article}</p>
+            {:else}
+                <p class="color-text-lighter placeholder">Lorem ipsum dolor sit amet...</p>
+            {/if}
+        </div>
+        <a class="font-primary description-section" href="/more_info">
+            <p>More info</p>
+            <div class="arrow-more-info">
+                <MaskedIcon icon={arrow_icon} alt="More info" />
+            </div>
+        </a>
+    </div>
 </div>
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Flow+Circular&display=swap');
 
-    h3 {
-        margin: 0;
-        color: var(--color-text);
-    }
-
     .output-image-section {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-
-        height: 20rem;
-
-        box-sizing: border-box;
-
-        background: var(--color-primary);
-        border-bottom: 2px solid var(--color-tertiary);
+        border-bottom: 2px solid var(--color-secondary);
 
         margin: 0.5em;
     }
 
-    .output-prompt {
+    .image-container {
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
         justify-content: flex-start;
+        align-items: center;
+        gap: 0.5em;
 
-        width: 100%;
-        height: 100%;
+        height: 10rem;
 
-        font-size: 1em;
-        font-weight: 600;
-
-        color: var(--color-text);
-
-        text-align: left;
-        overflow-y: scroll;
-        padding: 0 0.5em;
-
-        box-sizing: border-box;
+        overflow-x: scroll;
     }
 
     .output-image {
         height: 100%;
-
-        margin: 0.5em;
+        aspect-ratio: 1/1;
 
         border-radius: var(--border-radius);
+
+        cursor: pointer;
+    }
+
+    .description-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        padding: 0;
+    }
+
+    .description-section {
+        display: flex;
+        flex-direction: row;
+
+        width: fit-content;
+        white-space: nowrap;
+
+        margin: 0;
+    }
+
+    .description-section p, a {
+        margin: 0;
+        margin-right: 0.5em;
+    }
+
+    .arrow-more-info {
+        width: 1em;
+        height: 1em;
+
+        margin-left: -0.25em;
     }
 
     .image-placeholder {
-        height: 20rem;
-        aspect-ratio: 1/1;
-
-        background: var(--color-text);
-
-        border-radius: var(--border-radius);
-
-        animation: blinking 2s infinite ease-in-out;
-
         display: flex;
-        flex-direction: column;
-        align-items: center;
         justify-content: center;
-    }
+        align-items: center;
 
-    @keyframes blinking {
-        0% {
-            background: rgba(var(--color-tertiary), 0.5);
-        }
-
-        40% {
-            background: rgba(var(--color-tertiary), 1);
-        }
-
-        100% {
-            background: rgba(var(--color-tertiary), 0.5);
-        }
-    }
-
-    .placeholder {
-        font-family: 'Flow Circular', cursive;
-        color: var(--color-tertiary);
-        font-size: 1.1em;
-        margin-top: 0em;
-
-        animation: blinking-text 2s infinite ease-in-out;
-
-        user-select: none;
-    }
-
-    @keyframes blinking-text {
-        0% {
-            color: var(--color-tertiary);
-        }
-
-        40% {
-            color: var(--color-primary);
-        }
-
-        100% {
-            color: var(--color-tertiary);
-        }
+        width: 100%;
+        height: 100%;
     }
 </style>

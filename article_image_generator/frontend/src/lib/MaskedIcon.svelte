@@ -2,6 +2,7 @@
     export let icon: string;
     export let alt: string = undefined;
     export let url: string = undefined;
+    export let color: string = "var(--color-text)";
 
     function maskSvg(icon: string, element) {
         element = element.parentElement;
@@ -16,6 +17,8 @@
         element.style.maskRepeat = "no-repeat";
 
         element.style.display = "inline-block";
+
+        element.style.backgroundColor = color;
     }
 </script>
 
@@ -39,15 +42,15 @@
 
 <style>
     img {
-        width: var(--icon-size);
-
         display: none;
+        
+        width: 100%;
     }
 
     .mask {
         display: none;
-        width: calc(var(--icon-size) + 0.5em);
-        height: calc(var(--icon-size) + 0.5em);
+        width: 100%;
+        height: 100%;
 
         flex-shrink: 0;
 
