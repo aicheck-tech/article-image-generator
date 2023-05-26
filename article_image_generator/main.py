@@ -38,8 +38,11 @@ def text_to_image(main_funcion, text_and_look: TextToPromptRequest) -> JSONRespo
     steps = max(min(text_and_look.steps, MAX_STEPS), MIN_STEPS)  # Limit steps between 20 and 90
     samples = max(min(text_and_look.samples, MAX_SAMPLES), MIN_SAMPLES)  # Limit samples between 1 and 4
     output: Dict[str, Union[bytes, float, str]] = main_funcion(text_for_processing, IMAGE_STYLES[image_look], steps=steps, samples=samples)
-    images = output["pil_images"] 
-    logging.info(f"Number of images: {len(images)}")
+    images = output.get("pil_images", None) 
+    if images is None:
+        return JSONResponse(status_code=451, content={
+            "error": output["error"]
+        })
     images_base64 = []
     for image in images:
         image_byte_arr = io.BytesIO()
