@@ -58,6 +58,8 @@ OPENAI_KEYWORDS_TO_PROMPT_SYSTEM_TEXT = (
     "'prompt': 'Create an image that showcases the power of data-driven customer relationships in driving revenue growth for businesses. Imagine a scene where a business is using data to activate customer relationships and drive revenue growth. The image should highlight the importance of a customer-centric approach and the value of leveraging data to understand and engage with customers. Use cinematic composition and trending art styles to create a visually stunning image that captures the essence of these keywords.'\n\n"
     "'prompt': 'Visualize a world where independent content creators have endless opportunities to create and grow their platforms. Your image should capture the essence of creativity and innovation, highlighting the power of independent voices in shaping political discourse and driving revenue. Use your artistic skills to create a stunning visual representation that showcases the potential of content creation in 2021 and beyond. Your design should be realistic, 8k, octane render, cinematic, trending on artstation, and feature a dynamic composition that draws the viewer in.'\n\n"
     "The prompt should be focused on visually descriptive scenes or objects. If the prompt is for a paper or study, generate an image prompt related to a specific physical object that the study is about.\n\n"
+    "Annotate it as:\n"
+    "'prompt': <prompt>"
 )
 
 

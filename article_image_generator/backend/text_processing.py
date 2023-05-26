@@ -245,7 +245,10 @@ class TextProcessing:
 
         logger.debug(response)
         answer = response["choices"][0]["text"]
-        result = answer.split("'prompt': ")[1]
+        try:
+            result = answer.split("'prompt': ")[1]
+        except IndexError:
+            raise ValueError("Prompt was not craeted")
         return result
 
     def text_to_tagged_prompt(self, text, tags: List[str]) -> str:
