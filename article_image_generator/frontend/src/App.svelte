@@ -9,15 +9,28 @@
 
     import design_services_icon from "@assets/icons/design_services_fill.png";
     import brush_icon from "@assets/icons/brush_fill.png";
-    import view_column_icon from "@assets/icons/view_column_fill.svg";
     import TitlePanel from "./lib/TitlePanel.svelte";
+    import SmartSlider from "@lib/SmartSlider.svelte";
 
     const image_looks = ["realistic", "cinematic", "cartoon", "sketch"];
     const processing_methods = ["Key-words", "Summarization"];
 
     let current_image_look: string;
     let current_processing_method: string;
-    let current_batch_size: string;
+    let current_batch_size: string = "1";
+    let image_preview: {
+        image_base64: string,
+        prompt: string,
+        processing_method: string,
+        visual_look: string,
+        date: string,
+    } = {
+        image_base64: null,
+        prompt: null,
+        processing_method: null,
+        visual_look: null,
+        date: null
+    }
 
     let textarea_value: string = "";
     let output_of_generated_objects: Array<{
@@ -29,7 +42,27 @@
             date: string,
         }>,
         article: string
-    }> = []
+    }> = [
+        {
+            images: [
+                {
+                    image_base64: "https://picsum.photos/512/512",
+                    prompt: "Something something",
+                    processing_method: "summarization",
+                    visual_look: "realistic",
+                    date: new Date().toISOString().split('T')[0]
+                },
+                {
+                    image_base64: "https://picsum.photos/515/515",
+                    prompt: "Something else",
+                    processing_method: "summarization",
+                    visual_look: "realistic",
+                    date: new Date().toISOString().split('T')[0]
+                },
+            ],
+            article: "This is a article"
+        }
+    ]
 
     async function imagine(event) {
         event.target.disabled = true;
@@ -110,8 +143,7 @@
                 bind:value={textarea_value}
                 class="article-textarea font-secondary-regular"
                 placeholder="Insert you article here..."
-            />
-
+            ></textarea>
             <Dropdown
                 name="Processing method"
                 current_item_id={1}
@@ -126,12 +158,12 @@
                 bind:current_item={current_image_look}
                 icon={brush_icon}
             />
-            <Dropdown
-                name="Number of images"
-                current_item_id={0}
-                items={["1", "2", "3", "4"]}
-                icon={view_column_icon}
-                bind:current_item={current_batch_size}
+            <SmartSlider
+                slider_text="Number of images"
+                value_min="1"
+                value_max="4"
+                bind:value={current_batch_size}
+
             />
             <button on:click={imagine} class="imagine-button">
                 <span class="invert">Imagine</span>
@@ -143,17 +175,39 @@
                 <OutputImageSection
                     images={output.images}
                     article={output.article}
+                    bind:image_preview={image_preview}
                 />
             {/each}
         </output>
 
         <section class="info-panel">
-            <h2 class="font-primary">How this works</h2>
-            <ul class="font-secondary-regular color-text-lighter">
-                <li>Enter your article</li>
-                <li>Our advanced algorithms analyze your text</li>
-                <li>Sit back and watch as the generator selects relevant images to perfectly complement your content</li>
-            </ul>
+            {#if image_preview.image_base64 !== null}
+                <h2 class="font-primary">Image preview</h2>
+                <img src={image_preview.image_base64} alt="Generated image"/>
+                <div class="image-preview-line">
+                    <p class="font-secondary-bold">Prompt: </p>
+                    <p class="font-secondary-regular color-text-lighter">{image_preview.prompt}</p>
+                </div>
+                <div class="image-preview-line">
+                    <p class="font-secondary-bold">Processing method: </p>
+                    <p class="font-secondary-regular color-text-lighter">{image_preview.processing_method}</p>
+                </div>
+                <div class="image-preview-line">
+                    <p class="font-secondary-bold">Visual look: </p>
+                    <p class="font-secondary-regular color-text-lighter">{image_preview.visual_look}</p>
+                </div>
+                <div class="image-preview-line">
+                    <p class="font-secondary-bold">Creation date: </p>
+                    <p class="font-secondary-regular color-text-lighter">{image_preview.date}</p>
+                </div>
+            {:else}
+                <h2 class="font-primary">How this works</h2>
+                <ul class="font-secondary-regular color-text-lighter">
+                    <li>Enter your article</li>
+                    <li>Our advanced algorithms analyze your text</li>
+                    <li>Sit back and watch as the generator selects relevant images to perfectly complement your content</li>
+                </ul>
+            {/if}
         </section>
     </div>
 </main>
@@ -189,8 +243,7 @@
         display: flex;
         flex-direction: column;
 
-        padding: 0.5em;
-        padding-right: 0.25em;
+        padding: 0.5em 0.25em 0.5em 0.5em;
         box-sizing: border-box;
     }
 
@@ -215,9 +268,15 @@
 
     .info-panel > ul {
         margin: 0;
-        padding: 0;
-        
-        padding-left: 1em;
+        padding: 0 0 0 1em;
+    }
+
+    .image-preview-line {
+        display: inline-block;
+    }
+
+    .info-panel > img {
+        width: 100%;
     }
 
     .article-textarea {

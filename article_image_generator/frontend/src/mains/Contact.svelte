@@ -44,7 +44,7 @@
             <div class="user-section">
 
                 <p class="font-secondary-regular">{developer.name}</p>
-                <li class="font-secondary-regular">{developer.role}</li>
+                <p class="font-secondary-regular">{developer.role}</p>
                 
                 <div class="flex-row">
                     <div class="icon-wrapper">

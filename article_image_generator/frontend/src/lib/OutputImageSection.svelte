@@ -11,13 +11,41 @@
             date: string,
         }> = undefined;
     export let article = undefined;
+    export let image_preview: {
+        image_base64: string,
+        prompt: string,
+        processing_method: string,
+        visual_look: string,
+        date: string,
+    } = undefined;
+
+    function downloadImage(image) {
+        downloadBase64Image(image.image_base64, `${image.date}.png`);
+    }
+
+    function downloadBase64Image(base64Data, filename) {
+        window.open(base64Data, '_blank')
+    }
 </script>
 
 <div class="output-image-section">
     <div class="image-container">
         {#each images as image}
             {#if image.image_base64 !== undefined }
-                <img class="output-image" src={image.image_base64} alt="output" />
+                <img
+                    class="output-image"
+                    src={image.image_base64}
+                    alt="output"
+                    on:click={() => downloadImage(image)}
+                    on:mouseover={() => {image_preview = image}}
+                    on:mouseleave={() => image_preview = {
+                        image_base64: null,
+                        prompt: null,
+                        processing_method: null,
+                        visual_look: null,
+                        date: null,
+                    }}
+                />
             {:else}
                 <div class="image-placeholder output-image"><LoaderIcon/></div>
             {/if}
@@ -43,6 +71,7 @@
 </div>
 
 <style>
+    /*noinspection CssUnknownTarget*/
     @import url('https://fonts.googleapis.com/css2?family=Flow+Circular&display=swap');
 
     .output-image-section {
@@ -90,8 +119,7 @@
     }
 
     .description-section p, a {
-        margin: 0;
-        margin-right: 0.5em;
+        margin: 0 0.5em 0 0;
     }
 
     .arrow-more-info {
