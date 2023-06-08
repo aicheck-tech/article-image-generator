@@ -114,8 +114,8 @@
                 output_of_generated_objects[output_of_generated_objects.length - 1].images = [];
                 data.images_base64.forEach((image, idx) => {
                     output_of_generated_objects[output_of_generated_objects.length - 1].images.push({
-                        image_base64: `data:image/png;base64,${image}`,
-                        prompt: data.prompts[idx],
+                        image_base64: image,
+                        prompt: data.prompts[idx].text,
                         processing_method: current_processing_method,
                         visual_look: current_image_look,
                         date: current_time,
@@ -183,10 +183,10 @@
         <section class="info-panel">
             {#if image_preview.image_base64 !== null}
                 <h2 class="font-primary">Image preview</h2>
-                <img src={image_preview.image_base64} alt="Generated image"/>
+                <img src={image_preview.image_base64} alt="Generated"/>
                 <div class="image-preview-line">
                     <p class="font-secondary-bold">Prompt: </p>
-                    <p class="font-secondary-regular color-text-lighter">{image_preview.prompt}</p>
+                    <p class="font-secondary-regular color-text-lighter text-compact">{image_preview.prompt}</p>
                 </div>
                 <div class="image-preview-line">
                     <p class="font-secondary-bold">Processing method: </p>

@@ -19,12 +19,17 @@
         date: string,
     } = undefined;
 
-    function downloadImage(image) {
-        downloadBase64Image(image.image_base64, `${image.date}.png`);
+    $: if (images[0].image_base64 !== undefined) {
+        images.forEach((image) => {
+            if (image.image_base64.slice(0, 4) === "http") { return; }
+            else if (image.image_base64.slice(0, 4) !== "data") {
+                image.image_base64 = `data:image/png;base64,${image.image_base64}`;
+            }
+        });
     }
 
-    function downloadBase64Image(base64Data, filename) {
-        window.open(base64Data, '_blank')
+    function imageClicked(image) {
+        console.log(image);
     }
 </script>
 
@@ -36,14 +41,18 @@
                     class="output-image"
                     src={image.image_base64}
                     alt="output"
-                    on:click={() => downloadImage(image)}
-                    on:mouseover={() => {image_preview = image}}
-                    on:mouseleave={() => image_preview = {
-                        image_base64: null,
-                        prompt: null,
-                        processing_method: null,
-                        visual_look: null,
-                        date: null,
+                    on:click={() => imageClicked(image)}
+                    on:mouseover={() => {
+                        image_preview = image;
+                    }}
+                    on:mouseleave={() => {
+                        image_preview = {
+                            image_base64: null,
+                            prompt: null,
+                            processing_method: null,
+                            visual_look: null,
+                            date: null,
+                        }
                     }}
                 />
             {:else}

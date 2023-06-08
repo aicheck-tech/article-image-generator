@@ -3,7 +3,7 @@ export async function textToImage(
         image_look: string,
         processing_method: string,
         batch_size: number,
-        ): Promise<{ images_base64: Array<string>; prompts: Array<string> }> {
+        ): Promise<{ images_base64: Array<string>; prompts: Array<{text: string}> }> {
 
     const request_body = {
         text_for_processing: text,
@@ -31,7 +31,7 @@ export async function textToImage(
 
     if (request_response.status !== 200) {
         return {
-            prompts: ["Error"],
+            prompts: [{text: "Error"}],
             images_base64: [],
         }
     }
