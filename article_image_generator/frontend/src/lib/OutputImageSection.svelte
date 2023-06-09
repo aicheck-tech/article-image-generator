@@ -19,15 +19,6 @@
         date: string,
     } = undefined;
 
-    $: if (images[0].image_base64 !== undefined) {
-        images.forEach((image) => {
-            if (image.image_base64.slice(0, 4) === "http") { return; }
-            else if (image.image_base64.slice(0, 4) !== "data") {
-                image.image_base64 = `data:image/png;base64,${image.image_base64}`;
-            }
-        });
-    }
-
     function imageClicked(image) {
         console.log(image);
     }

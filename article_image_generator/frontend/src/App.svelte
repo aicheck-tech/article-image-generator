@@ -11,6 +11,7 @@
     import brush_icon from "@assets/icons/brush_fill.png";
     import TitlePanel from "./lib/TitlePanel.svelte";
     import SmartSlider from "@lib/SmartSlider.svelte";
+    import ScrollingText from "@lib/ScrollingText.svelte";
 
     const image_looks = ["realistic", "cinematic", "cartoon", "sketch"];
     const processing_methods = ["Key-words", "Summarization"];
@@ -99,8 +100,8 @@
         output_of_generated_objects = output_of_generated_objects;
 
         textToImage(
-            textarea_value, 
-            current_image_look, 
+            textarea_value,
+            current_image_look,
             current_processing_method,
             parseInt(current_batch_size)
             ).then((data) => {
@@ -114,18 +115,36 @@
                 output_of_generated_objects[output_of_generated_objects.length - 1].images = [];
                 data.images_base64.forEach((image, idx) => {
                     output_of_generated_objects[output_of_generated_objects.length - 1].images.push({
-                        image_base64: image,
+                        image_base64: `data:image/png;base64,${image}`,
                         prompt: data.prompts[idx].text,
                         processing_method: current_processing_method,
                         visual_look: current_image_look,
                         date: current_time,
-                    }) 
+                    })
                 });
                 output_of_generated_objects = output_of_generated_objects;
+
+                saveImage();
 
                 event.target.disabled = false;
             }
         );
+    }
+
+    function saveImage() {
+        const link = document.createElement('a');
+        link.href = image_preview.image_base64;
+        link.download = 'image.png';
+
+        // Set the anchor element to trigger a download only after the image data has fully loaded
+        link.addEventListener('load', () => {
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Start loading the image
+        link.dispatchEvent(new MouseEvent('click'));
     }
 
     onMount(() => {
@@ -186,7 +205,9 @@
                 <img src={image_preview.image_base64} alt="Generated"/>
                 <div class="image-preview-line">
                     <p class="font-secondary-bold">Prompt: </p>
-                    <p class="font-secondary-regular color-text-lighter text-compact">{image_preview.prompt}</p>
+                    <ScrollingText>
+                        <p class="font-secondary-regular color-text-lighter text-compact">{image_preview.prompt}</p>
+                    </ScrollingText>
                 </div>
                 <div class="image-preview-line">
                     <p class="font-secondary-bold">Processing method: </p>
