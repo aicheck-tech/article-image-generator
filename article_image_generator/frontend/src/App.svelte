@@ -120,31 +120,14 @@
                         processing_method: current_processing_method,
                         visual_look: current_image_look,
                         date: current_time,
-                    })
+                    });
                 });
                 output_of_generated_objects = output_of_generated_objects;
 
-                saveImage();
 
                 event.target.disabled = false;
             }
         );
-    }
-
-    function saveImage() {
-        const link = document.createElement('a');
-        link.href = image_preview.image_base64;
-        link.download = 'image.png';
-
-        // Set the anchor element to trigger a download only after the image data has fully loaded
-        link.addEventListener('load', () => {
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-
-        // Start loading the image
-        link.dispatchEvent(new MouseEvent('click'));
     }
 
     onMount(() => {
@@ -227,6 +210,7 @@
                     <li>Enter your article</li>
                     <li>Our advanced algorithms analyze your text</li>
                     <li>Sit back and watch as the generator selects relevant images to perfectly complement your content</li>
+                    <li>Download images by clicking on them</li>
                 </ul>
             {/if}
         </section>
@@ -279,7 +263,7 @@
     .info-panel {
         flex: calc(1 / 4);
 
-        width: 100%;
+        max-width: calc(1 / 4 * 100%);
 
         display: flex;
         flex-direction: column;

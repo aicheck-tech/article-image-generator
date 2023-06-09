@@ -2,6 +2,7 @@
     import LoaderIcon from "@lib/LoaderIcon.svelte";
     import arrow_icon from "@assets/icons/arrow.svg";
     import MaskedIcon from "./MaskedIcon.svelte";
+    import {downloadImage, saveImageToClipboard} from "@scripts/image-utils.js";
 
     export let images: Array<{
             image_base64: string,
@@ -19,8 +20,18 @@
         date: string,
     } = undefined;
 
+    let isDownloadAllowed = true;
+
     function imageClicked(image) {
-        console.log(image);
+        if (!isDownloadAllowed) { return; }
+
+        downloadImage(image.image_base64, `${image.date}-${image.prompt.split(" ").slice(0, 3).join("-")}.png`);
+        saveImageToClipboard(image.image_base64);
+
+        isDownloadAllowed = false;
+        setTimeout(() => {
+            isDownloadAllowed = true;
+        }, 2000);
     }
 </script>
 
