@@ -2,6 +2,7 @@
     import LoaderIcon from "@lib/LoaderIcon.svelte";
     import arrow_icon from "@assets/icons/arrow.svg";
     import MaskedIcon from "./MaskedIcon.svelte";
+    import {downloadImage, saveImageToClipboard} from "@scripts/image-utils.js";
 
     export let images: Array<{
             image_base64: string,
@@ -11,13 +12,51 @@
             date: string,
         }> = undefined;
     export let article = undefined;
+    export let image_preview: {
+        image_base64: string,
+        prompt: string,
+        processing_method: string,
+        visual_look: string,
+        date: string,
+    } = undefined;
+
+    let isDownloadAllowed = true;
+
+    function imageClicked(image) {
+        if (!isDownloadAllowed) { return; }
+
+        downloadImage(image.image_base64, `${image.date}-${image.prompt.split(" ").slice(0, 3).join("-")}.png`);
+        saveImageToClipboard(image.image_base64);
+
+        isDownloadAllowed = false;
+        setTimeout(() => {
+            isDownloadAllowed = true;
+        }, 2000);
+    }
 </script>
 
 <div class="output-image-section">
     <div class="image-container">
         {#each images as image}
             {#if image.image_base64 !== undefined }
-                <img class="output-image" src={image.image_base64} alt="output" />
+                <img
+                    class="output-image"
+                    src={image.image_base64}
+                    alt="output"
+                    on:click={() => imageClicked(image)}
+                    on:mouseover={() => {
+                        image_preview = image;
+                    }}
+                    on:mouseleave={() => {
+                        image_preview = {
+                            image_base64: null,
+                            prompt: null,
+                            processing_method: null,
+                            visual_look: null,
+                            date: null,
+                        }
+                    }}
+                />
             {:else}
                 <div class="image-placeholder output-image"><LoaderIcon/></div>
             {/if}
@@ -43,6 +82,7 @@
 </div>
 
 <style>
+    /*noinspection CssUnknownTarget*/
     @import url('https://fonts.googleapis.com/css2?family=Flow+Circular&display=swap');
 
     .output-image-section {
@@ -90,8 +130,7 @@
     }
 
     .description-section p, a {
-        margin: 0;
-        margin-right: 0.5em;
+        margin: 0 0.5em 0 0;
     }
 
     .arrow-more-info {

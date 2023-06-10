@@ -1,5 +1,8 @@
+/*noinspection CssUnknownTarget*/
 @import url('https://fonts.googleapis.com/css2?family=Overpass:wght@700&display=swap');
+/*noinspection CssUnknownTarget*/
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+/*noinspection CssUnknownTarget*/
 @import url('https://fonts.googleapis.com/css2?family=Flow+Circular&display=swap');
 
 :root {
@@ -81,12 +84,11 @@ body {
 }
 
 button {
-    border-radius: 8px;
     border: 1px solid transparent;
     padding-left: 0.3em;
     padding-top: 0.2em;
     padding-bottom: 0.1em;
-    
+
     background: var(--color-secondary);
     cursor: pointer;
     transition: border-color 0.25s;
@@ -101,11 +103,11 @@ button {
     text-align: left;
 }
 button:hover {
-    border-color: var(--color-highlight);
+    border-color: var(--color-secondary);
 }
 button:focus,
 button:focus-visible {
-    outline: 4px auto var(--color-highlight);
+    outline: 4px auto var(--color-secondary);
 }
 button:disabled {
     opacity: 0.5;
