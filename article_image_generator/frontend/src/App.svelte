@@ -18,7 +18,7 @@
 
     let current_image_look: string;
     let current_processing_method: string;
-    let current_batch_size: string = "1";
+    let current_number_of_images: string = "1";
     let image_preview: {
         image_base64: string,
         prompt: string,
@@ -89,7 +89,7 @@
             date: current_time,
         }
         let image_placeholders = [];
-        for (let i = 0; i < parseInt(current_batch_size); i++) {
+        for (let i = 0; i < parseInt(current_number_of_images); i++) {
             image_placeholders.push(image_placeholder);
         }
 
@@ -103,7 +103,7 @@
             textarea_value,
             current_image_look,
             current_processing_method,
-            parseInt(current_batch_size)
+            parseInt(current_number_of_images)
             ).then((data) => {
                 if (data.images_base64.length == 0) {
                     output_of_generated_objects.pop();
@@ -164,7 +164,7 @@
                 slider_text="Number of images"
                 value_min="1"
                 value_max="4"
-                bind:value={current_batch_size}
+                bind:value={current_number_of_images}
 
             />
             <button on:click={imagine} class="imagine-button">
